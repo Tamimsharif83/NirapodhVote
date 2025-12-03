@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>প্রশাসক লগইন - নিরাপদ ভোট</title>
+    <link rel="stylesheet" href="assets/css/common.css">
+    <link rel="stylesheet" href="assets/css/auth.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <img src="assets/images/logo.svg" alt="বাংলাদেশ সরকার" class="logo">
+            <div class="header-title">
+                <h1>নিরাপদ ভোট</h1>
+                <p>প্রশাসক প্যানেল</p>
+            </div>
+            <img src="assets/images/logo.svg" alt="বাংলাদেশ সরকার" class="logo">
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="auth-container single-card">
+            <div class="auth-card card admin-card">
+                <div class="admin-badge">
+                    <span>🛡️ প্রশাসক</span>
+                </div>
+
+                <div class="auth-header">
+                    <h2>প্রশাসক লগইন</h2>
+                    <p>নির্বাচন কমিশনার অ্যাক্সেস</p>
+                </div>
+
+                <div id="alertContainer"></div>
+
+                <form id="adminLoginForm" class="auth-form">
+                    <div class="form-group">
+                        <label for="adminId">প্রশাসক আইডি *</label>
+                        <input 
+                            type="text" 
+                            id="adminId" 
+                            name="adminId" 
+                            placeholder="আপনার প্রশাসক আইডি লিখুন"
+                            required
+                        >
+                        <small class="form-hint">উদাহরণ: ADMIN-2025-001</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">পাসওয়ার্ড *</label>
+                        <div class="password-input-wrapper">
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password" 
+                                placeholder="আপনার পাসওয়ার্ড লিখুন"
+                                required
+                            >
+                            <button type="button" class="toggle-password" onclick="togglePassword('password')">
+                                👁️
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="remember">
+                            <span>এই ডিভাইসে মনে রাখুন</span>
+                        </label>
+                    </div>
+
+                    <div class="security-notice">
+                        <strong>⚠️ নিরাপত্তা সতর্কতা:</strong> প্রশাসক প্যানেলে শুধুমাত্র অনুমোদিত ব্যক্তিরা প্রবেশ করতে পারবেন। অননুমোদিত প্রবেশের চেষ্টা আইনত দণ্ডনীয়।
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full" id="submitBtn">
+                        <span id="btnText">প্রশাসক প্যানেলে প্রবেশ করুন</span>
+                        <span id="btnLoader" class="loading hidden"></span>
+                    </button>
+                </form>
+
+                <div class="auth-links">
+                    <a href="#" class="link" onclick="contactSupport()">সহায়তা যোগাযোগ করুন</a>
+                </div>
+
+                <div class="divider">
+                    <span>অথবা</span>
+                </div>
+
+                <div class="citizen-login-link">
+                    <a href="login.html" class="btn btn-secondary btn-full">
+                        নাগরিক হিসেবে লগইন করুন
+                    </a>
+                </div>
+
+                <div class="back-home">
+                    <a href="index.html">← হোম পেজে ফিরে যান</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; ২০২৫ নিরাপদ ভোট সিস্টেম। সর্বস্বত্ব সংরক্ষিত।</p>
+            <p>বাংলাদেশ নির্বাচন কমিশন</p>
+        </div>
+    </footer>
+
+    <script src="assets/js/common.js"></script>
+    <script src="assets/js/admin-login.js"></script>
+</body>
+</html>
