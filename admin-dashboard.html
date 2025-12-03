@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>প্রশাসক ড্যাশবোর্ড - নিরাপদ ভোট</title>
+    <link rel="stylesheet" href="assets/css/common.css">
+    <link rel="stylesheet" href="assets/css/admin.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <img src="assets/images/logo.svg" alt="বাংলাদেশ সরকার" class="logo">
+            <div class="header-title">
+                <h1>নিরাপদ ভোট - প্রশাসক প্যানেল</h1>
+                <p>নির্বাচন ব্যবস্থাপনা সিস্টেম</p>
+            </div>
+            <div class="header-actions">
+                <span class="admin-name">প্রশাসক: মোঃ রহিম</span>
+                <button class="btn btn-secondary btn-sm" onclick="logout()">লগআউট</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="admin-layout">
+        <aside class="sidebar">
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" onclick="showSection('dashboard')">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">ড্যাশবোর্ড</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('ballot')">
+                    <span class="nav-icon">🗳️</span>
+                    <span class="nav-text">ব্যালট তৈরি</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('candidates')">
+                    <span class="nav-icon">👥</span>
+                    <span class="nav-text">প্রার্থী তালিকা</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('notice')">
+                    <span class="nav-icon">📢</span>
+                    <span class="nav-text">নোটিশ প্রকাশ</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('results')">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">ফলাফল ব্যবস্থাপনা</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('complaints')">
+                    <span class="nav-icon">📝</span>
+                    <span class="nav-text">অভিযোগ ব্যবস্থাপনা</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('chat')">
+                    <span class="nav-icon">💬</span>
+                    <span class="nav-text">নাগরিক চ্যাট</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('settings')">
+                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-text">সেটিংস</span>
+                </a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard-section" class="content-section active">
+                <div class="section-header">
+                    <h2>ড্যাশবোর্ড</h2>
+                    <p>সার্বিক পরিসংখ্যান ও কার্যক্রম</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card card">
+                        <div class="stat-icon" style="background: #e3f2fd;">📊</div>
+                        <div class="stat-info">
+                            <h3>মোট ব্যালট</h3>
+                            <p class="stat-number">১২</p>
+                        </div>
+                    </div>
+                    <div class="stat-card card">
+                        <div class="stat-icon" style="background: #e8f5e9;">✅</div>
+                        <div class="stat-info">
+                            <h3>সক্রিয় ভোট</h3>
+                            <p class="stat-number">৩</p>
+                        </div>
+                    </div>
+                    <div class="stat-card card">
+                        <div class="stat-icon" style="background: #fff3e0;">👥</div>
+                        <div class="stat-info">
+                            <h3>মোট ভোটার</h3>
+                            <p class="stat-number">১,২৫,৪৫০</p>
+                        </div>
+                    </div>
+                    <div class="stat-card card">
+                        <div class="stat-icon" style="background: #f3e5f5;">🗳️</div>
+                        <div class="stat-info">
+                            <h3>প্রদত্ত ভোট</h3>
+                            <p class="stat-number">৮৫,৩২০</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <h3>🔴 লাইভ ভোটিং পরিসংখ্যান</h3>
+                        <div class="live-stats">
+                            <div class="live-stat-item">
+                                <span class="live-label">ঢাকা-১ আসন:</span>
+                                <span class="live-value">৪৫,২৩৪ ভোট</span>
+                                <span class="live-percentage">৬৮%</span>
+                            </div>
+                            <div class="live-stat-item">
+                                <span class="live-label">চট্টগ্রাম-২ আসন:</span>
+                                <span class="live-value">৩২,১৮৯ ভোট</span>
+                                <span class="live-percentage">৫৫%</span>
+                            </div>
+                            <div class="live-stat-item">
+                                <span class="live-label">সিলেট-৩ আসন:</span>
+                                <span class="live-value">৭,৮৯৭ ভোট</span>
+                                <span class="live-percentage">৪২%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>⏰ সাম্প্রতিক কার্যক্রম</h3>
+                        <div class="activity-list">
+                            <div class="activity-item">
+                                <span class="activity-time">৫ মিনিট আগে</span>
+                                <p>নতুন ব্যালট "ঢাকা-৫ আসন" তৈরি হয়েছে</p>
+                            </div>
+                            <div class="activity-item">
+                                <span class="activity-time">১৫ মিনিট আগে</span>
+                                <p>১২৩ জন নতুন ভোটার নিবন্ধিত হয়েছে</p>
+                            </div>
+                            <div class="activity-item">
+                                <span class="activity-time">৩০ মিনিট আগে</span>
+                                <p>নোটিশ প্রকাশ: "ভোটিং সময় বৃদ্ধি"</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Ballot Creation Section -->
+            <section id="ballot-section" class="content-section">
+                <div class="section-header">
+                    <h2>ব্যালট তৈরি করুন</h2>
+                    <p>নতুন নির্বাচনী ব্যালট তৈরি ও পরিচালনা করুন</p>
+                </div>
+
+                <div class="card">
+                    <form id="ballotForm" class="ballot-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="ballotName">ব্যালটের নাম *</label>
+                                <input type="text" id="ballotName" placeholder="যেমন: ঢাকা-১ আসন নির্বাচন" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="ballotLocation">নির্বাচন এলাকা *</label>
+                                <input type="text" id="ballotLocation" placeholder="যেমন: ঢাকা-১" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="startDate">শুরুর তারিখ ও সময় *</label>
+                                <input type="datetime-local" id="startDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="endDate">শেষ তারিখ ও সময় *</label>
+                                <input type="datetime-local" id="endDate" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>ভাষা নির্বাচন করুন *</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="language" value="bangla" checked>
+                                    <span>বাংলা</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="language" value="english">
+                                    <span>English</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="language" value="both">
+                                    <span>উভয়</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="candidates-section">
+                            <h3>প্রার্থী যোগ করুন</h3>
+                            <div id="candidatesList"></div>
+                            <button type="button" class="btn btn-secondary" onclick="addCandidate()">
+                                + নতুন প্রার্থী যোগ করুন
+                            </button>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">ব্যালট সংরক্ষণ করুন</button>
+                            <button type="button" class="btn btn-secondary" onclick="previewBallot()">পূর্বরূপ দেখুন</button>
+                            <button type="reset" class="btn btn-danger">রিসেট</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Candidates List Section -->
+            <section id="candidates-section" class="content-section">
+                <div class="section-header">
+                    <h2>প্রার্থী তালিকা</h2>
+                    <p>সকল নির্বাচনী প্রার্থীর তথ্য</p>
+                </div>
+
+                <div class="card">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ছবি</th>
+                                    <th>নাম</th>
+                                    <th>দল</th>
+                                    <th>প্রতীক</th>
+                                    <th>এলাকা</th>
+                                    <th>অবস্থা</th>
+                                    <th>পদক্ষেপ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="candidatesTableBody">
+                                <tr>
+                                    <td><div class="candidate-photo">👤</div></td>
+                                    <td>মোঃ করিম</td>
+                                    <td>আওয়ামী লীগ</td>
+                                    <td><div class="party-symbol">🚢</div></td>
+                                    <td>ঢাকা-১</td>
+                                    <td><span class="badge badge-success">সক্রিয়</span></td>
+                                    <td>
+                                        <button class="btn-icon" onclick="editCandidate(1)">✏️</button>
+                                        <button class="btn-icon" onclick="deleteCandidate(1)">🗑️</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Notice Section -->
+            <section id="notice-section" class="content-section">
+                <div class="section-header">
+                    <h2>নোটিশ প্রকাশ</h2>
+                    <p>নাগরিকদের জন্য গুরুত্বপূর্ণ নোটিশ প্রকাশ করুন</p>
+                </div>
+
+                <div class="card">
+                    <form id="noticeForm">
+                        <div class="form-group">
+                            <label for="noticeTitle">নোটিশ শিরোনাম *</label>
+                            <input type="text" id="noticeTitle" placeholder="নোটিশের শিরোনাম লিখুন" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="noticeType">নোটিশ ধরন *</label>
+                            <select id="noticeType" required>
+                                <option value="">নির্বাচন করুন</option>
+                                <option value="general">সাধারণ</option>
+                                <option value="urgent">জরুরী</option>
+                                <option value="schedule">সময়সূচী</option>
+                                <option value="result">ফলাফল</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>নোটিশ বিষয়বস্তু *</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="contentType" value="text" checked onclick="toggleNoticeContent('text')">
+                                    <span>টেক্সট বার্তা</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="contentType" value="pdf" onclick="toggleNoticeContent('pdf')">
+                                    <span>PDF ফাইল</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group" id="textContent">
+                            <label for="noticeMessage">বার্তা *</label>
+                            <textarea id="noticeMessage" rows="6" placeholder="নোটিশের বিস্তারিত লিখুন..."></textarea>
+                        </div>
+
+                        <div class="form-group hidden" id="pdfContent">
+                            <label for="noticePdf">PDF ফাইল আপলোড করুন *</label>
+                            <input type="file" id="noticePdf" accept=".pdf">
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">নোটিশ প্রকাশ করুন</button>
+                            <button type="reset" class="btn btn-secondary">রিসেট</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card mt-20">
+                    <h3>প্রকাশিত নোটিশ সমূহ</h3>
+                    <div class="notice-list">
+                        <div class="notice-item">
+                            <div class="notice-header">
+                                <h4>ভোটিং সময়সূচী পরিবর্তন</h4>
+                                <span class="badge badge-urgent">জরুরী</span>
+                            </div>
+                            <p class="notice-date">প্রকাশিত: ৩ ডিসেম্বর ২০২৫, ১০:৩০ AM</p>
+                            <p class="notice-preview">আগামীকাল ভোটিং সময় ৮টা থেকে ৬টা পর্যন্ত বর্ধিত করা হয়েছে...</p>
+                            <div class="notice-actions">
+                                <button class="btn btn-sm btn-secondary">সম্পাদনা</button>
+                                <button class="btn btn-sm btn-danger">মুছে ফেলুন</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section id="results-section" class="content-section">
+                <div class="section-header">
+                    <h2>ফলাফল ব্যবস্থাপনা</h2>
+                    <p>ভোটের ফলাফল গণনা ও প্রকাশ</p>
+                </div>
+
+                <div class="card">
+                    <div class="form-group">
+                        <label for="selectBallot">ব্যালট নির্বাচন করুন</label>
+                        <select id="selectBallot">
+                            <option value="">ব্যালট নির্বাচন করুন</option>
+                            <option value="1">ঢাকা-১ আসন নির্বাচন</option>
+                            <option value="2">চট্টগ্রাম-২ আসন নির্বাচন</option>
+                        </select>
+                    </div>
+
+                    <div class="results-summary">
+                        <h3>ফলাফল সারসংক্ষেপ - ঢাকা-১ আসন</h3>
+                        <div class="result-stats">
+                            <div class="result-stat">
+                                <span class="result-label">মোট ভোটার:</span>
+                                <span class="result-value">৫০,০০০</span>
+                            </div>
+                            <div class="result-stat">
+                                <span class="result-label">প্রদত্ত ভোট:</span>
+                                <span class="result-value">৪৫,২৩৪</span>
+                            </div>
+                            <div class="result-stat">
+                                <span class="result-label">ভোট প্রদানের হার:</span>
+                                <span class="result-value">৯০.৪৭%</span>
+                            </div>
+                        </div>
+
+                        <div class="candidate-results">
+                            <div class="candidate-result-item">
+                                <div class="candidate-info">
+                                    <div class="candidate-photo">👤</div>
+                                    <div>
+                                        <h4>মোঃ করিম</h4>
+                                        <p>আওয়ামী লীগ - 🚢</p>
+                                    </div>
+                                </div>
+                                <div class="vote-count">
+                                    <span class="votes">২৫,৪৫০ ভোট</span>
+                                    <div class="vote-bar">
+                                        <div class="vote-fill" style="width: 56%"></div>
+                                    </div>
+                                    <span class="percentage">৫৬.২৫%</span>
+                                </div>
+                            </div>
+                            <div class="candidate-result-item">
+                                <div class="candidate-info">
+                                    <div class="candidate-photo">👤</div>
+                                    <div>
+                                        <h4>মোঃ রহিম</h4>
+                                        <p>বিএনপি - 🌾</p>
+                                    </div>
+                                </div>
+                                <div class="vote-count">
+                                    <span class="votes">১৯,৭৮৪ ভোট</span>
+                                    <div class="vote-bar">
+                                        <div class="vote-fill" style="width: 44%"></div>
+                                    </div>
+                                    <span class="percentage">৪৩.৭৫%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button class="btn btn-primary" onclick="calculateResults()">ফলাফল পুনর্গণনা করুন</button>
+                        <button class="btn btn-secondary" onclick="exportResults()">PDF হিসেবে রপ্তানি করুন</button>
+                        <button class="btn btn-primary" onclick="publishResults()">ফলাফল প্রকাশ করুন</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Complaints Section -->
+            <section id="complaints-section" class="content-section">
+                <div class="section-header">
+                    <h2>অভিযোগ ব্যবস্থাপনা</h2>
+                    <p>নাগরিকদের অভিযোগ দেখুন ও সমাধান করুন</p>
+                </div>
+
+                <div class="card">
+                    <div class="complaints-list">
+                        <div class="complaint-item">
+                            <div class="complaint-header">
+                                <h4>অভিযোগ #০০১</h4>
+                                <span class="badge badge-warning">অপেক্ষমান</span>
+                            </div>
+                            <p class="complaint-date">জমা: ৩ ডিসেম্বর ২০২৫, ২:৩০ PM</p>
+                            <p class="complaint-text">আমার ভোট সঠিকভাবে রেজিস্টার হয়নি। অনুগ্রহ করে যাচাই করুন।</p>
+                            <div class="complaint-meta">
+                                <span>এলাকা: ঢাকা-১</span>
+                                <span>ভোটার ID: ****5678</span>
+                            </div>
+                            <div class="form-group">
+                                <label>প্রশাসক মন্তব্য</label>
+                                <textarea rows="3" placeholder="আপনার প্রতিক্রিয়া লিখুন..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>প্রমাণপত্র আপলোড করুন (যদি থাকে)</label>
+                                <input type="file" accept=".pdf,.jpg,.png">
+                            </div>
+                            <div class="complaint-actions">
+                                <button class="btn btn-sm btn-primary">সমাধান করুন</button>
+                                <button class="btn btn-sm btn-danger">প্রত্যাখ্যান করুন</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chat Section -->
+            <section id="chat-section" class="content-section">
+                <div class="section-header">
+                    <h2>নাগরিক চ্যাট</h2>
+                    <p>নাগরিকদের সাথে সরাসরি যোগাযোগ</p>
+                </div>
+
+                <div class="chat-container">
+                    <div class="chat-list card">
+                        <h3>চ্যাট তালিকা</h3>
+                        <div class="chat-item active">
+                            <div class="chat-avatar">👤</div>
+                            <div class="chat-info">
+                                <h4>নাগরিক #১২৩৪</h4>
+                                <p>শেষ বার্তা: ধন্যবাদ...</p>
+                            </div>
+                            <span class="unread-badge">২</span>
+                        </div>
+                        <div class="chat-item">
+                            <div class="chat-avatar">👤</div>
+                            <div class="chat-info">
+                                <h4>নাগরিক #৫৬৭৮</h4>
+                                <p>আমার ভোট...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chat-window card">
+                        <div class="chat-header">
+                            <h3>নাগরিক #১২৩৪</h3>
+                            <span class="chat-status">অনলাইন</span>
+                        </div>
+                        <div class="chat-messages">
+                            <div class="message user-message">
+                                <p>আমার ভোট কেন্দ্র কোথায়?</p>
+                                <span class="message-time">২:৩০ PM</span>
+                            </div>
+                            <div class="message admin-message">
+                                <p>আপনার NID অনুযায়ী আপনার ভোট কেন্দ্র হল ঢাকা সিটি কলেজ।</p>
+                                <span class="message-time">২:৩২ PM</span>
+                            </div>
+                            <div class="message user-message">
+                                <p>ধন্যবাদ!</p>
+                                <span class="message-time">২:৩৩ PM</span>
+                            </div>
+                        </div>
+                        <div class="chat-input">
+                            <input type="text" placeholder="বার্তা লিখুন..." id="chatMessage">
+                            <button class="btn btn-primary" onclick="sendMessage()">পাঠান</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings-section" class="content-section">
+                <div class="section-header">
+                    <h2>সেটিংস</h2>
+                    <p>প্রশাসক অ্যাকাউন্ট ও সিস্টেম সেটিংস</p>
+                </div>
+
+                <div class="card">
+                    <h3>পাসওয়ার্ড পরিবর্তন</h3>
+                    <form id="changePasswordForm">
+                        <div class="form-group">
+                            <label for="currentPassword">বর্তমান পাসওয়ার্ড *</label>
+                            <input type="password" id="currentPassword" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="newPassword">নতুন পাসওয়ার্ড *</label>
+                            <input type="password" id="newPassword" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmNewPassword">নতুন পাসওয়ার্ড নিশ্চিত করুন *</label>
+                            <input type="password" id="confirmNewPassword" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">পাসওয়ার্ড পরিবর্তন করুন</button>
+                    </form>
+                </div>
+
+                <div class="card mt-20">
+                    <h3>প্রশাসক তথ্য</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">প্রশাসক ID:</span>
+                            <span class="info-value">ADMIN-2025-001</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">নাম:</span>
+                            <span class="info-value">মোঃ রহিম</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">ইমেইল:</span>
+                            <span class="info-value">admin@nirapod-vote.gov.bd</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">শেষ লগইন:</span>
+                            <span class="info-value">৩ ডিসেম্বর ২০২৫, ৯:০০ AM</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="assets/js/common.js"></script>
+    <script src="assets/js/admin.js"></script>
+</body>
+</html>

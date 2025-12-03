@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>পাসওয়ার্ড তৈরি করুন - নিরাপদ ভোট</title>
+    <link rel="stylesheet" href="assets/css/common.css">
+    <link rel="stylesheet" href="assets/css/auth.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <img src="assets/images/logo.svg" alt="বাংলাদেশ সরকার" class="logo">
+            <div class="header-title">
+                <h1>নিরাপদ ভোট</h1>
+                <p>স্বচ্ছ ও নিরাপদ ডিজিটাল ভোটিং সিস্টেম</p>
+            </div>
+            <img src="assets/images/logo.svg" alt="বাংলাদেশ সরকার" class="logo">
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="auth-container">
+            <div class="auth-card card">
+                <div class="auth-header">
+                    <h2>পাসওয়ার্ড তৈরি করুন</h2>
+                    <p>আপনার অ্যাকাউন্টের জন্য একটি শক্তিশালী পাসওয়ার্ড তৈরি করুন</p>
+                </div>
+
+                <div class="success-message">
+                    <div class="success-icon">✓</div>
+                    <p>OTP যাচাইকরণ সফল হয়েছে!</p>
+                </div>
+
+                <div id="alertContainer"></div>
+
+                <form id="signupForm" class="auth-form">
+                    <div class="user-info-box">
+                        <h4>নিবন্ধিত তথ্য</h4>
+                        <div class="info-row">
+                            <span class="info-label">NID:</span>
+                            <span class="info-value" id="userNid">১২৩৪৫৬৭৮৯০</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">মোবাইল:</span>
+                            <span class="info-value" id="userPhone">০১৭১২৩৪৫৬৭৮</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">নতুন পাসওয়ার্ড *</label>
+                        <div class="password-input-wrapper">
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password" 
+                                placeholder="শক্তিশালী পাসওয়ার্ড তৈরি করুন"
+                                required
+                                minlength="8"
+                            >
+                            <button type="button" class="toggle-password" onclick="togglePassword('password')">
+                                👁️
+                            </button>
+                        </div>
+                        <small class="form-hint">কমপক্ষে ৮ অক্ষর, একটি বড় হাতের অক্ষর, একটি ছোট হাতের অক্ষর এবং একটি সংখ্যা থাকতে হবে</small>
+                    </div>
+
+                    <div class="password-strength">
+                        <div class="strength-bar">
+                            <div class="strength-fill" id="strengthFill"></div>
+                        </div>
+                        <span class="strength-text" id="strengthText">পাসওয়ার্ড শক্তি: দুর্বল</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword">পাসওয়ার্ড নিশ্চিত করুন *</label>
+                        <div class="password-input-wrapper">
+                            <input 
+                                type="password" 
+                                id="confirmPassword" 
+                                name="confirmPassword" 
+                                placeholder="পুনরায় পাসওয়ার্ড লিখুন"
+                                required
+                            >
+                            <button type="button" class="toggle-password" onclick="togglePassword('confirmPassword')">
+                                👁️
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="terms" required>
+                            <span>আমি সকল <a href="#" class="link">নিয়ম ও শর্তাবলী</a> পড়েছি এবং সম্মত আছি</span>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full" id="submitBtn">
+                        <span id="btnText">অ্যাকাউন্ট তৈরি করুন</span>
+                        <span id="btnLoader" class="loading hidden"></span>
+                    </button>
+                </form>
+
+                <div class="back-home">
+                    <a href="index.html">← হোম পেজে ফিরে যান</a>
+                </div>
+            </div>
+
+            <div class="help-section card">
+                <h3>🔐 নিরাপত্তা টিপস</h3>
+                <div class="help-item">
+                    <h4>শক্তিশালী পাসওয়ার্ড তৈরি করুন</h4>
+                    <p>বড় ও ছোট হাতের অক্ষর, সংখ্যা এবং বিশেষ চিহ্ন ব্যবহার করুন।</p>
+                </div>
+                <div class="help-item">
+                    <h4>পাসওয়ার্ড গোপন রাখুন</h4>
+                    <p>কারো সাথে আপনার পাসওয়ার্ড শেয়ার করবেন না।</p>
+                </div>
+                <div class="help-item">
+                    <h4>নিয়মিত পরিবর্তন করুন</h4>
+                    <p>নিরাপত্তার জন্য মাঝে মাঝে পাসওয়ার্ড পরিবর্তন করুন।</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; ২০২৫ নিরাপদ ভোট সিস্টেম। সর্বস্বত্ব সংরক্ষিত।</p>
+        </div>
+    </footer>
+
+    <script src="assets/js/common.js"></script>
+    <script src="assets/js/signup.js"></script>
+</body>
+</html>
