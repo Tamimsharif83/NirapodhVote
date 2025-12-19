@@ -100,6 +100,7 @@
                                         <img src="https://via.placeholder.com/60" alt="প্রতীক" class="party-symbol">
                                     </div>
                                 </label>
+                                <button class="btn btn-sm btn-secondary" onclick="openCandidateModal(1)" style="margin-top: 10px; width: 100%;">বিস্তারিত দেখুন</button>
                             </div>
 
                             <div class="candidate-card">
@@ -112,6 +113,7 @@
                                         <img src="https://via.placeholder.com/60" alt="প্রতীক" class="party-symbol">
                                     </div>
                                 </label>
+                                <button class="btn btn-sm btn-secondary" onclick="openCandidateModal(2)" style="margin-top: 10px; width: 100%;">বিস্তারিত দেখুন</button>
                             </div>
 
                             <div class="candidate-card">
@@ -124,6 +126,7 @@
                                         <img src="https://via.placeholder.com/60" alt="প্রতীক" class="party-symbol">
                                     </div>
                                 </label>
+                                <button class="btn btn-sm btn-secondary" onclick="openCandidateModal(3)" style="margin-top: 10px; width: 100%;">বিস্তারিত দেখুন</button>
                             </div>
                         </div>
 
@@ -460,6 +463,22 @@
             </div>
         </section>
     </main>
+
+    <!-- Candidate Details Modal -->
+    <div id="candidateModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>প্রার্থীর বিস্তারিত তথ্য</h2>
+                <span class="close-modal" onclick="closeCandidateModal()">&times;</span>
+            </div>
+            <div class="modal-body" id="candidateModalBody">
+                <!-- Content will be loaded dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeCandidateModal()">বন্ধ করুন</button>
+            </div>
+        </div>
+    </div>
 
     <script src="assets/js/common.js"></script>
     <script src="assets/js/citizen-dashboard.js"></script>

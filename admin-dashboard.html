@@ -237,6 +237,7 @@
                                     <td>ঢাকা-১</td>
                                     <td><span class="badge badge-success">সক্রিয়</span></td>
                                     <td>
+                                        <button class="btn-icon" onclick="viewCandidateDetails(1)" title="বিস্তারিত দেখুন">👁️</button>
                                         <button class="btn-icon" onclick="editCandidate(1)">✏️</button>
                                         <button class="btn-icon" onclick="deleteCandidate(1)">🗑️</button>
                                     </td>
@@ -540,6 +541,22 @@
                 </div>
             </section>
         </main>
+    </div>
+
+    <!-- Candidate Details Modal -->
+    <div id="candidateModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>প্রার্থীর বিস্তারিত তথ্য</h2>
+                <span class="close-modal" onclick="closeCandidateModal()">&times;</span>
+            </div>
+            <div class="modal-body" id="candidateModalBody">
+                <!-- Content will be loaded dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeCandidateModal()">বন্ধ করুন</button>
+            </div>
+        </div>
     </div>
 
     <script src="assets/js/common.js"></script>
