@@ -725,11 +725,14 @@
     border-radius: 50%;
     font-size: 1.2rem;
     transition: all 0.3s ease;
+    text-decoration: none;
+    color: inherit;
 }
 
 .social-link:hover {
     background: white;
     transform: translateY(-5px);
+    text-decoration: none;
 }
 
 .footer-bottom {
