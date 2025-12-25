@@ -362,7 +362,7 @@
 
 .result-card h3 {
     font-size: 1.5rem;
-    color: var(--primary-green);
+    color:black;
     margin-bottom: 15px;
 }
 
@@ -377,13 +377,13 @@
 
 .result-status.live {
     background: var(--danger-red);
-    color: white;
+    color: black;
     animation: pulse 2s infinite;
 }
 
 .result-status.completed {
     background: var(--success-green);
-    color: white;
+    color: rgb(0, 0, 0);
 }
 
 @keyframes pulse {
@@ -466,7 +466,7 @@
 
 .winner-announcement {
     background: linear-gradient(135deg, var(--success-green), var(--primary-green));
-    color: white;
+    color: rgb(0, 0, 0);
     padding: 25px;
     border-radius: 8px;
     text-align: center;
