@@ -485,3 +485,132 @@ window.addEventListener('beforeunload', function(e) {
 });
 
 console.log('নিরাপদ ভোট - নাগরিক ড্যাশবোর্ড সফলভাবে লোড হয়েছে ✓');
+
+// Candidate Details Modal Logic
+const candidateData = {
+    1: {
+        name: "মোঃ আবদুল্লাহ",
+        party: "গণতান্ত্রিক দল",
+        symbol: "assets/images/symbol1.png", // Placeholder
+        photo: "https://via.placeholder.com/150",
+        bio: "মোঃ আবদুল্লাহ একজন অভিজ্ঞ রাজনীতিবিদ যিনি গত ২০ বছর ধরে জনসেবায় নিয়োজিত আছেন। তিনি ঢাকা বিশ্ববিদ্যালয় থেকে রাষ্ট্রবিজ্ঞানে স্নাতকোত্তর ডিগ্রি অর্জন করেছেন।",
+        manifesto: [
+            "শিক্ষার মান উন্নয়ন ও ডিজিটাল শিক্ষা ব্যবস্থা প্রবর্তন",
+            "বেকার যুবকদের জন্য কর্মসংস্থান সৃষ্টি",
+            "স্বাস্থ্যসেবা সহজলভ্য করা",
+            "দুর্নীতি মুক্ত সমাজ গঠন"
+        ],
+        socialActivities: [
+            "সভাপতি, স্থানীয় স্কুল কমিটি (২০১০-বর্তমান)",
+            "প্রতিষ্ঠাতা, আবদুল্লাহ চ্যারিটেবল ট্রাস্ট",
+            "সদস্য, রেড ক্রিসেন্ট সোসাইটি"
+        ],
+        partyHistory: "গণতান্ত্রিক দল ১৯৮০ সালে প্রতিষ্ঠিত হয়। দলটি দেশের গণতন্ত্র ও মানবাধিকার রক্ষায় সর্বদা সোচ্চার। গত নির্বাচনে দলটি সংসদে ২০টি আসন লাভ করে।"
+    },
+    2: {
+        name: "সালমা খাতুন",
+        party: "জনকল্যাণ পার্টি",
+        symbol: "assets/images/symbol2.png", // Placeholder
+        photo: "https://via.placeholder.com/150",
+        bio: "সালমা খাতুন একজন সমাজকর্মী ও নারী অধিকার নেত্রী। তিনি তৃণমূল পর্যায় থেকে রাজনীতিতে উঠে এসেছেন এবং নারীদের ক্ষমতায়নে কাজ করছেন।",
+        manifesto: [
+            "নারীদের জন্য নিরাপদ কর্মপরিবেশ নিশ্চিত করা",
+            "ক্ষুদ্র ও মাঝারি শিল্পের বিকাশ",
+            "পরিবেশ সংরক্ষণ ও বনায়ণ",
+            "মাদক মুক্ত সমাজ গঠন"
+        ],
+        socialActivities: [
+            "পরিচালক, নারী উন্নয়ন সংস্থা",
+            "সদস্য, পরিবেশ রক্ষা আন্দোলন",
+            "স্বেচ্ছাসেবী, বন্যা দুর্গতদের সাহায্য তহবিল"
+        ],
+        partyHistory: "জনকল্যাণ পার্টি ২০০৫ সালে প্রতিষ্ঠিত হয়। এটি একটি প্রগতিশীল রাজনৈতিক দল যা সাধারণ মানুষের কল্যাণে কাজ করে।"
+    },
+    3: {
+        name: "রহিম উদ্দিন",
+        party: "স্বাধীন প্রার্থী",
+        symbol: "assets/images/symbol3.png", // Placeholder
+        photo: "https://via.placeholder.com/150",
+        bio: "রহিম উদ্দিন একজন সফল ব্যবসায়ী ও সমাজসেবক। তিনি কোনো রাজনৈতিক দলের সাথে যুক্ত নন এবং স্বতন্ত্রভাবে জনগণের সেবা করতে চান।",
+        manifesto: [
+            "স্থানীয় অবকাঠামো উন্নয়ন",
+            "বিশুদ্ধ পানি সরবরাহ নিশ্চিত করা",
+            "ক্রীড়া ও সংস্কৃতির বিকাশ",
+            "প্রবীণ নাগরিকদের জন্য বিশেষ সুবিধা"
+        ],
+        socialActivities: [
+            "সভাপতি, স্থানীয় বাজার কমিটি",
+            "দাতা সদস্য, এতিমখানা",
+            "আয়োজক, বার্ষিক ক্রীড়া প্রতিযোগিতা"
+        ],
+        partyHistory: "স্বতন্ত্র প্রার্থী হিসেবে তিনি কোনো নির্দিষ্ট রাজনৈতিক দলের অন্তর্ভুক্ত নন। তিনি জনগণের সরাসরি সমর্থনে বিশ্বাসী।"
+    }
+};
+
+function openCandidateModal(candidateId) {
+    const modal = document.getElementById('candidateModal');
+    const modalBody = document.getElementById('candidateModalBody');
+    const candidate = candidateData[candidateId];
+
+    if (!candidate) return;
+
+    let manifestoHtml = '<ul class="detail-list">';
+    candidate.manifesto.forEach(item => {
+        manifestoHtml += `<li>${item}</li>`;
+    });
+    manifestoHtml += '</ul>';
+
+    let socialHtml = '<ul class="detail-list">';
+    candidate.socialActivities.forEach(item => {
+        socialHtml += `<li>${item}</li>`;
+    });
+    socialHtml += '</ul>';
+
+    modalBody.innerHTML = `
+        <div class="candidate-profile-header">
+            <img src="${candidate.photo}" alt="${candidate.name}" class="candidate-profile-img">
+            <div class="candidate-profile-info">
+                <h3>${candidate.name}</h3>
+                <div class="candidate-party-info">
+                    <img src="https://via.placeholder.com/40" alt="প্রতীক" class="party-symbol-small">
+                    <strong>${candidate.party}</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="detail-section">
+            <h4>জীবনী</h4>
+            <p>${candidate.bio}</p>
+        </div>
+
+        <div class="detail-section">
+            <h4>নির্বাচনী ইশতেহার</h4>
+            ${manifestoHtml}
+        </div>
+
+        <div class="detail-section">
+            <h4>সামাজিক কর্মকাণ্ড</h4>
+            ${socialHtml}
+        </div>
+
+        <div class="detail-section">
+            <h4>দলীয় ইতিহাস</h4>
+            <p>${candidate.partyHistory}</p>
+        </div>
+    `;
+
+    modal.style.display = "block";
+}
+
+function closeCandidateModal() {
+    const modal = document.getElementById('candidateModal');
+    modal.style.display = "none";
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('candidateModal');
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}

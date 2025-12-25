@@ -80,6 +80,25 @@ function addCandidate() {
                 <input type="file" accept="image/*">
             </div>
         </div>
+        
+        <!-- New Fields -->
+        <div class="form-group">
+            <label>জীবনী (Bio)</label>
+            <textarea rows="3" placeholder="প্রার্থীর সংক্ষিপ্ত জীবনী..."></textarea>
+        </div>
+        <div class="form-group">
+            <label>নির্বাচনী ইশতেহার (Manifesto)</label>
+            <textarea rows="3" placeholder="ইশতেহারের পয়েন্টগুলো লিখুন..."></textarea>
+        </div>
+        <div class="form-group">
+            <label>সামাজিক কর্মকাণ্ড</label>
+            <textarea rows="2" placeholder="সামাজিক কর্মকাণ্ডের বিবরণ..."></textarea>
+        </div>
+        <div class="form-group">
+            <label>দলীয় ইতিহাস</label>
+            <textarea rows="2" placeholder="দলের সংক্ষিপ্ত ইতিহাস..."></textarea>
+        </div>
+
         <button type="button" class="btn btn-danger btn-sm" onclick="removeCandidate(${candidateCount})">
             এই প্রার্থী সরান
         </button>
@@ -211,4 +230,96 @@ function handlePasswordChange(e) {
     
     showAlert('পাসওয়ার্ড সফলভাবে পরিবর্তন হয়েছে!', 'success');
     e.target.reset();
+}
+
+// Candidate Details Modal Logic (Admin)
+const candidateData = {
+    1: {
+        name: "মোঃ করিম",
+        party: "আওয়ামী লীগ",
+        symbol: "assets/images/symbol1.png", // Placeholder
+        photo: "https://via.placeholder.com/150",
+        bio: "মোঃ করিম একজন অভিজ্ঞ রাজনীতিবিদ। তিনি গত ১০ বছর ধরে এই এলাকার উন্নয়নে কাজ করছেন।",
+        manifesto: [
+            "রাস্তাঘাটের উন্নয়ন",
+            "নতুন স্কুল স্থাপন",
+            "বিদ্যুৎ সমস্যার সমাধান"
+        ],
+        socialActivities: [
+            "সভাপতি, স্থানীয় ক্লাব",
+            "সদস্য, মসজিদ কমিটি"
+        ],
+        partyHistory: "বাংলাদেশ আওয়ামী লীগ ১৯৪৯ সালে প্রতিষ্ঠিত হয়। এটি বাংলাদেশের স্বাধীনতা যুদ্ধে নেতৃত্বদানকারী দল।"
+    }
+};
+
+function viewCandidateDetails(candidateId) {
+    const modal = document.getElementById('candidateModal');
+    const modalBody = document.getElementById('candidateModalBody');
+    const candidate = candidateData[candidateId];
+
+    if (!candidate) {
+        alert("প্রার্থীর তথ্য পাওয়া যায়নি");
+        return;
+    }
+
+    let manifestoHtml = '<ul class="detail-list">';
+    candidate.manifesto.forEach(item => {
+        manifestoHtml += `<li>${item}</li>`;
+    });
+    manifestoHtml += '</ul>';
+
+    let socialHtml = '<ul class="detail-list">';
+    candidate.socialActivities.forEach(item => {
+        socialHtml += `<li>${item}</li>`;
+    });
+    socialHtml += '</ul>';
+
+    modalBody.innerHTML = `
+        <div class="candidate-profile-header">
+            <img src="${candidate.photo}" alt="${candidate.name}" class="candidate-profile-img">
+            <div class="candidate-profile-info">
+                <h3>${candidate.name}</h3>
+                <div class="candidate-party-info">
+                    <img src="https://via.placeholder.com/40" alt="প্রতীক" class="party-symbol-small">
+                    <strong>${candidate.party}</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="detail-section">
+            <h4>জীবনী</h4>
+            <p>${candidate.bio}</p>
+        </div>
+
+        <div class="detail-section">
+            <h4>নির্বাচনী ইশতেহার</h4>
+            ${manifestoHtml}
+        </div>
+
+        <div class="detail-section">
+            <h4>সামাজিক কর্মকাণ্ড</h4>
+            ${socialHtml}
+        </div>
+
+        <div class="detail-section">
+            <h4>দলীয় ইতিহাস</h4>
+            <p>${candidate.partyHistory}</p>
+        </div>
+    `;
+
+    modal.style.display = "block";
+}
+
+function closeCandidateModal() {
+    const modal = document.getElementById('candidateModal');
+    modal.style.display = "none";
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('candidateModal');
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
 }
