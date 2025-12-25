@@ -67,7 +67,7 @@ function addCandidate() {
             </div>
             <div class="form-group">
                 <label>রাজনৈতিক দল *</label>
-                <input type="text" required placeholder="যেমন: আওয়ামী লীগ">
+                <input type="text" required placeholder="যেমন: জাতীয় নাগরিক পার্টি">
             </div>
         </div>
         <div class="form-row">
@@ -236,7 +236,7 @@ function handlePasswordChange(e) {
 const candidateData = {
     1: {
         name: "মোঃ করিম",
-        party: "আওয়ামী লীগ",
+        party: "জাতীয় নাগরিক পার্টি (এনসিপি)",
         symbol: "assets/images/symbol1.png", // Placeholder
         photo: "https://via.placeholder.com/150",
         bio: "মোঃ করিম একজন অভিজ্ঞ রাজনীতিবিদ। তিনি গত ১০ বছর ধরে এই এলাকার উন্নয়নে কাজ করছেন।",
@@ -249,7 +249,7 @@ const candidateData = {
             "সভাপতি, স্থানীয় ক্লাব",
             "সদস্য, মসজিদ কমিটি"
         ],
-        partyHistory: "বাংলাদেশ আওয়ামী লীগ ১৯৪৯ সালে প্রতিষ্ঠিত হয়। এটি বাংলাদেশের স্বাধীনতা যুদ্ধে নেতৃত্বদানকারী দল।"
+        partyHistory: "জাতীয় নাগরিক পার্টি (এনসিপি) একটি আধুনিক প্রগতিশীল রাজনৈতিক দল যা সুশাসন, স্বচ্ছতা এবং নাগরিক অধিকার রক্ষায় প্রতিশ্রুতিবদ্ধ। দলটি গণতান্ত্রিক মূল্যবোধ এবং সামাজিক ন্যায়বিচার প্রতিষ্ঠায় কাজ করে।"
     }
 };
 
