@@ -1,8 +1,4 @@
-// Index Page JavaScript - Dynamic and Interactive Features
 
-// ===========================
-// Intersection Observer for Animations
-// ===========================
 const observerOptions = {
     threshold: 0.1,
     rootMargin: '0px 0px -50px 0px'
@@ -33,9 +29,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// ===========================
 // Counter Animation
-// ===========================
+
 let countersAnimated = false;
 
 function animateCounters() {
@@ -74,9 +69,8 @@ function animateCounters() {
     });
 }
 
-// ===========================
 // Smooth Scrolling
-// ===========================
+
 document.querySelectorAll('a.smooth-scroll').forEach(anchor => {
     anchor.addEventListener('click', function(e) {
         e.preventDefault();
@@ -95,9 +89,10 @@ document.querySelectorAll('a.smooth-scroll').forEach(anchor => {
     });
 });
 
-// ===========================
+
 // Scroll to Top Button
-// ===========================
+
+
 const scrollTopBtn = document.getElementById('scrollTopBtn');
 
 window.addEventListener('scroll', () => {
@@ -123,9 +118,9 @@ scrollTopBtn.addEventListener('click', () => {
     });
 });
 
-// ===========================
+
 // Feature Cards Interactive Effect
-// ===========================
+
 const featureItems = document.querySelectorAll('.feature-item');
 
 featureItems.forEach(item => {
@@ -138,9 +133,9 @@ featureItems.forEach(item => {
     });
 });
 
-// ===========================
+
 // Step Cards Interactive Animation
-// ===========================
+
 const steps = document.querySelectorAll('.step');
 
 steps.forEach((step, index) => {
@@ -157,9 +152,9 @@ steps.forEach((step, index) => {
     });
 });
 
-// ===========================
+
 // Parallax Effect on Background Circles
-// ===========================
+
 window.addEventListener('scroll', () => {
     const scrolled = window.pageYOffset;
     const circles = document.querySelectorAll('.circle');
@@ -170,9 +165,9 @@ window.addEventListener('scroll', () => {
     });
 });
 
-// ===========================
+
 // Dynamic Button Ripple Effect
-// ===========================
+
 document.querySelectorAll('.btn').forEach(button => {
     button.addEventListener('click', function(e) {
         const ripple = document.createElement('span');
@@ -220,9 +215,9 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-// ===========================
+
 // Info Cards Sequential Animation
-// ===========================
+
 const infoCards = document.querySelectorAll('.info-card');
 
 const cardObserver = new IntersectionObserver((entries) => {
@@ -243,9 +238,10 @@ infoCards.forEach(card => {
     cardObserver.observe(card);
 });
 
-// ===========================
+
 // Trust Indicators Animation
-// ===========================
+
+
 const trustItems = document.querySelectorAll('.trust-item');
 
 trustItems.forEach((item, index) => {
@@ -259,25 +255,26 @@ trustItems.forEach((item, index) => {
     item.style.transition = 'all 0.5s ease';
 });
 
-// ===========================
+
+
 // Real-time Clock (Bengali)
-// ===========================
+
+
 function updateClock() {
     const now = new Date();
     const hours = toBengaliNumber(now.getHours().toString().padStart(2, '0'));
     const minutes = toBengaliNumber(now.getMinutes().toString().padStart(2, '0'));
     const seconds = toBengaliNumber(now.getSeconds().toString().padStart(2, '0'));
     
-    // You can add a clock element to display this if needed
-    // document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
+    
 }
 
 setInterval(updateClock, 1000);
 updateClock();
 
-// ===========================
+
 // Chatbot Function Enhancement
-// ===========================
+
 window.openChatBot = function() {
     // Create modal overlay
     const modal = document.createElement('div');
@@ -340,9 +337,9 @@ window.openChatBot = function() {
     document.head.appendChild(fadeInStyle);
 };
 
-// ===========================
+
 // Performance Optimization
-// ===========================
+
 // Lazy load images when they come into view
 if ('IntersectionObserver' in window) {
     const imageObserver = new IntersectionObserver((entries) => {
@@ -363,9 +360,9 @@ if ('IntersectionObserver' in window) {
     });
 }
 
-// ===========================
+
 // Accessibility Enhancements
-// ===========================
+
 document.addEventListener('keydown', (e) => {
     // ESC key to close modals
     if (e.key === 'Escape') {
@@ -382,16 +379,15 @@ document.addEventListener('mousedown', () => {
     document.body.classList.remove('keyboard-navigation');
 });
 
-// ===========================
+
 // Console Welcome Message
-// ===========================
+
 console.log('%c নিরাপদ ভোট সিস্টেম ', 'background: #006A4E; color: white; font-size: 20px; padding: 10px;');
 console.log('%c স্বচ্ছ ও নিরাপদ ডিজিটাল ভোটিং সিস্টেম ', 'color: #006A4E; font-size: 14px;');
 console.log('%c Version 1.0.0 | © ২০২৫ বাংলাদেশ নির্বাচন কমিশন ', 'color: #666; font-size: 12px;');
 
-// ===========================
 // Page Load Complete
-// ===========================
+
 window.addEventListener('load', () => {
     console.log('✓ পেজ সম্পূর্ণভাবে লোড হয়েছে');
     document.body.classList.add('page-loaded');
