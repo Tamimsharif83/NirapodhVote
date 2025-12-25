@@ -98,10 +98,17 @@ body {
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     text-decoration: none;
     text-align: center;
     font-family: 'Noto Sans Bengali', Arial, sans-serif;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(30, 126, 52, 0.3);
 }
 
 .btn-primary {
@@ -109,10 +116,7 @@ body {
     color: white;
 }
 
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
-}
+/* .btn-primary:hover handled by .btn:hover */
 
 .btn-secondary {
     background: white;
@@ -123,8 +127,6 @@ body {
 .btn-secondary:hover {
     background: var(--primary-green);
     color: white;
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
 }
 
 .btn-danger {
@@ -134,8 +136,7 @@ body {
 
 .btn-danger:hover {
     background: #d01f36;
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
+    box-shadow: 0 8px 25px rgba(244, 42, 65, 0.3);
 }
 
 .form-group {
