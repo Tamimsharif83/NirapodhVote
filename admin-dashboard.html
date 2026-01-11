@@ -6,14 +6,15 @@
     <title>প্রশাসক ড্যাশবোর্ড - নিরাপদ ভোট</title>
     <link rel="stylesheet" href="assets/css/common.css">
     <link rel="stylesheet" href="assets/css/admin.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 </head>
 <body>
     <header class="header">
         <div class="header-content">
             <img src="assets/images/election_comission_logo-removebg-preview.png" alt="বাংলাদেশ সরকার" class="logo">
             <div class="header-title">
-                <h1>নিরাপদ ভোট - প্রশাসক প্যানেল</h1>
-                <p>নির্বাচন ব্যবস্থাপনা সিস্টেম</p>
+                <h1 style="color: #1e7e34; font-size: 1.6rem;">প্রধান নির্বাচন কমিশনার</h1>
+                <p style="color: #d32f2f;">Bangladesh Election Commissioner</p>
             </div>
             <div class="header-actions">
                 <button class="btn btn-secondary btn-sm" onclick="logout()">লগআউট</button>
@@ -26,42 +27,74 @@
         <aside class="sidebar">
             <nav class="sidebar-nav">
                 <a href="#" class="nav-item active" onclick="showSection('dashboard')">
-                    <span class="nav-icon">📊</span>
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+                        </svg>
+                    </span>
                     <span class="nav-text">ড্যাশবোর্ড</span>
                 </a>
                 <a href="#" class="nav-item" onclick="showSection('ballot')">
-                    <span class="nav-icon">🗳️</span>
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </span>
                     <span class="nav-text">ব্যালট তৈরি</span>
                 </a>
                 <a href="#" class="nav-item" onclick="showSection('candidates')">
-                    <span class="nav-icon">👥</span>
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+                        </svg>
+                    </span>
                     <span class="nav-text">প্রার্থী তালিকা</span>
                 </a>
                 <a href="#" class="nav-item" onclick="showSection('notice')">
-                    <span class="nav-icon">📢</span>
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/>
+                        </svg>
+                    </span>
                     <span class="nav-text">নোটিশ প্রকাশ</span>
                 </a>
                 <a href="#" class="nav-item" onclick="showSection('results')">
-                    <span class="nav-icon">📈</span>
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/>
+                        </svg>
+                    </span>
                     <span class="nav-text">ফলাফল ব্যবস্থাপনা</span>
                 </a>
                 <a href="#" class="nav-item" onclick="showSection('complaints')">
-                    <span class="nav-icon">📝</span>
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                        </svg>
+                    </span>
                     <span class="nav-text">অভিযোগ ব্যবস্থাপনা</span>
                 </a>
                 <a href="#" class="nav-item" onclick="showSection('chat')">
-                    <span class="nav-icon">💬</span>
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/>
+                        </svg>
+                    </span>
                     <span class="nav-text">নাগরিক চ্যাট</span>
                 </a>
                 <a href="#" class="nav-item" onclick="showSection('settings')">
-                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+                        </svg>
+                    </span>
                     <span class="nav-text">সেটিংস</span>
                 </a>
             </nav>
         </aside>
 
         <main class="main-content">
-            <!-- Dashboard Section -->
+        
             <section id="dashboard-section" class="content-section active">
                 <div class="section-header">
                     <h2>ড্যাশবোর্ড</h2>
@@ -70,82 +103,107 @@
 
                 <div class="stats-grid">
                     <div class="stat-card card">
-                        <div class="stat-icon" style="background: #e3f2fd;">📊</div>
+                        <div class="stat-icon" style="background: #e3f2fd;">
+                            <svg viewBox="0 0 24 24" fill="#1976d2" width="28" height="28">
+                                <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+                            </svg>
+                        </div>
                         <div class="stat-info">
                             <h3>মোট ব্যালট</h3>
-                            <p class="stat-number">১২</p>
+                            <p class="stat-number" id="total-ballots">...</p>
                         </div>
                     </div>
                     <div class="stat-card card">
-                        <div class="stat-icon" style="background: #e8f5e9;">✅</div>
+                        <div class="stat-icon" style="background: #e8f5e9;">
+                            <svg viewBox="0 0 24 24" fill="#2e7d32" width="28" height="28">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                            </svg>
+                        </div>
                         <div class="stat-info">
                             <h3>সক্রিয় ভোট</h3>
-                            <p class="stat-number">৩</p>
+                            <p class="stat-number" id="active-votes">...</p>
                         </div>
                     </div>
                     <div class="stat-card card">
-                        <div class="stat-icon" style="background: #fff3e0;">👥</div>
+                        <div class="stat-icon" style="background: #fff3e0;">
+                            <svg viewBox="0 0 24 24" fill="#f57c00" width="28" height="28">
+                                <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+                            </svg>
+                        </div>
                         <div class="stat-info">
                             <h3>মোট ভোটার</h3>
-                            <p class="stat-number">১,২৫,৪৫০</p>
+                            <p class="stat-number" id="total-voters">...</p>
                         </div>
                     </div>
                     <div class="stat-card card">
-                        <div class="stat-icon" style="background: #f3e5f5;">🗳️</div>
+                        <div class="stat-icon" style="background: #f3e5f5;">
+                            <svg viewBox="0 0 24 24" fill="#7b1fa2" width="28" height="28">
+                                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                        </div>
                         <div class="stat-info">
                             <h3>প্রদত্ত ভোট</h3>
-                            <p class="stat-number">৮৫,৩২০</p>
+                            <p class="stat-number" id="votes-cast">...</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="dashboard-grid">
                     <div class="card">
-                        <h3>🔴 লাইভ ভোটিং পরিসংখ্যান</h3>
-                        <div class="live-stats">
-                            <div class="live-stat-item">
-                                <span class="live-label">ঢাকা-১ আসন:</span>
-                                <span class="live-value">৪৫,২৩৪ ভোট</span>
-                                <span class="live-percentage">৬৮%</span>
-                            </div>
-                            <div class="live-stat-item">
-                                <span class="live-label">চট্টগ্রাম-২ আসন:</span>
-                                <span class="live-value">৩২,১৮৯ ভোট</span>
-                                <span class="live-percentage">৫৫%</span>
-                            </div>
-                            <div class="live-stat-item">
-                                <span class="live-label">সিলেট-৩ আসন:</span>
-                                <span class="live-value">৭,৮৯৭ ভোট</span>
-                                <span class="live-percentage">৪২%</span>
-                            </div>
+                        <h3>
+                            <svg viewBox="0 0 24 24" fill="#f44336" width="20" height="20" style="vertical-align: middle; margin-right: 8px;">
+                                <circle cx="12" cy="12" r="8"/>
+                            </svg>
+                            লাইভ ভোটিং পরিসংখ্যান
+                        </h3>
+                        <div class="live-stats" id="live-stats-container">
+                            <!-- Live stats will be loaded here -->
                         </div>
                     </div>
 
                     <div class="card">
                         <h3>⏰ সাম্প্রতিক কার্যক্রম</h3>
-                        <div class="activity-list">
-                            <div class="activity-item">
-                                <span class="activity-time">৫ মিনিট আগে</span>
-                                <p>নতুন ব্যালট "ঢাকা-৫ আসন" তৈরি হয়েছে</p>
-                            </div>
-                            <div class="activity-item">
-                                <span class="activity-time">১৫ মিনিট আগে</span>
-                                <p>১২৩ জন নতুন ভোটার নিবন্ধিত হয়েছে</p>
-                            </div>
-                            <div class="activity-item">
-                                <span class="activity-time">৩০ মিনিট আগে</span>
-                                <p>নোটিশ প্রকাশ: "ভোটিং সময় বৃদ্ধি"</p>
-                            </div>
+                        <div class="activity-list" id="activity-list-container">
+                            <!-- Activity list will be loaded here -->
                         </div>
+                    </div>
+                </div>
+
+                <div class="chart-grid">
+                    <div class="card">
+                        <h3>ভোটিং টার্নআউট ট্রেন্ড</h3>
+                        <canvas id="turnoutChart" height="220"></canvas>
+                    </div>
+                    <div class="card">
+                        <h3>ফলাফলের সারাংশ</h3>
+                        <canvas id="resultChart" height="220"></canvas>
                     </div>
                 </div>
             </section>
 
-            <!-- Ballot Creation Section -->
+
             <section id="ballot-section" class="content-section">
                 <div class="section-header">
                     <h2>ব্যালট তৈরি করুন</h2>
                     <p>নতুন নির্বাচনী ব্যালট তৈরি ও পরিচালনা করুন</p>
+                </div>
+
+                <!-- Add New Ballot Type and Location Section -->
+                <div class="card">
+                    <h3>নতুন ব্যালটের নাম ও এলাকা যোগ করুন</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="newBallotName">ব্যালটের নাম যোগ করুন *</label>
+                            <input type="text" id="newBallotName" placeholder="যেমন: জাতীয় সংসদ নির্বাচন ২০২৫" class="input-field">
+                        </div>
+                        <div class="form-group">
+                            <label for="newBallotLocation">নির্বাচন এলাকা যোগ করুন *</label>
+                            <input type="text" id="newBallotLocation" placeholder="যেমন: ঢাকা-১০" class="input-field">
+                        </div>
+                        <div class="form-group">
+                            <button type="button" class="btn btn-success" onclick="addNewBallotOption()" style="align-self: flex-end;">+ যোগ করুন</button>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="card">
@@ -153,11 +211,11 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="ballotName">ব্যালটের নাম *</label>
-                                <input type="text" id="ballotName" placeholder="যেমন: ঢাকা-১ আসন নির্বাচন" required>
+                                <select id="ballotName" required></select>
                             </div>
                             <div class="form-group">
                                 <label for="ballotLocation">নির্বাচন এলাকা *</label>
-                                <input type="text" id="ballotLocation" placeholder="যেমন: ঢাকা-১" required>
+                                <select id="ballotLocation" required></select>
                             </div>
                         </div>
 
@@ -172,23 +230,7 @@
                             </div>
                         </div>
 
-                        <div class="form-group">
-                            <label>ভাষা নির্বাচন করুন *</label>
-                            <div class="radio-group">
-                                <label class="radio-label">
-                                    <input type="radio" name="language" value="bangla" checked>
-                                    <span>বাংলা</span>
-                                </label>
-                                <label class="radio-label">
-                                    <input type="radio" name="language" value="english">
-                                    <span>English</span>
-                                </label>
-                                <label class="radio-label">
-                                    <input type="radio" name="language" value="both">
-                                    <span>উভয়</span>
-                                </label>
-                            </div>
-                        </div>
+                        
 
                         <div class="candidates-section">
                             <h3>প্রার্থী যোগ করুন</h3>
@@ -200,14 +242,14 @@
 
                         <div class="form-actions">
                             <button type="submit" class="btn btn-primary">ব্যালট সংরক্ষণ করুন</button>
-                            <button type="button" class="btn btn-secondary" onclick="previewBallot()">পূর্বরূপ দেখুন</button>
+                            
                             <button type="reset" class="btn btn-danger">রিসেট</button>
                         </div>
                     </form>
                 </div>
             </section>
 
-            <!-- Candidates List Section -->
+            
             <section id="candidates-section" class="content-section">
                 <div class="section-header">
                     <h2>প্রার্থী তালিকা</h2>
@@ -229,26 +271,14 @@
                                 </tr>
                             </thead>
                             <tbody id="candidatesTableBody">
-                                <tr>
-                                    <td><div class="candidate-photo">👤</div></td>
-                                    <td>মোঃ করিম</td>
-                                    <td>জাতীয় নাগরিক পার্টি</td>
-                                    <td><div class="party-symbol">⚖️</div></td>
-                                    <td>ঢাকা-১</td>
-                                    <td><span class="badge badge-success">সক্রিয়</span></td>
-                                    <td>
-                                        <button class="btn-icon" onclick="viewCandidateDetails(1)" title="বিস্তারিত দেখুন">👁️</button>
-                                        <button class="btn-icon" onclick="editCandidate(1)">✏️</button>
-                                        <button class="btn-icon" onclick="deleteCandidate(1)">🗑️</button>
-                                    </td>
-                                </tr>
+                                <!-- Candidates will be loaded here dynamically -->
                             </tbody>
                         </table>
                     </div>
                 </div>
             </section>
 
-            <!-- Notice Section -->
+            
             <section id="notice-section" class="content-section">
                 <div class="section-header">
                     <h2>নোটিশ প্রকাশ</h2>
@@ -322,8 +352,6 @@
                     </div>
                 </div>
             </section>
-
-            <!-- Results Section -->
             <section id="results-section" class="content-section">
                 <div class="section-header">
                     <h2>ফলাফল ব্যবস্থাপনা</h2>
@@ -360,10 +388,16 @@
                         <div class="candidate-results">
                             <div class="candidate-result-item">
                                 <div class="candidate-info">
-                                    <div class="candidate-photo">👤</div>
+                                    <div class="candidate-photo">
+                                        <svg viewBox="0 0 24 24" fill="#757575" width="32" height="32">
+                                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                        </svg>
+                                    </div>
                                     <div>
                                         <h4>মোঃ করিম</h4>
-                                        <p>জাতীয় নাগরিক পার্টি - ⚖️</p>
+                                        <p>জাতীয় নাগরিক পার্টি - 
+                                            <img src="assets/images/জাতীয়_নাগরিক_পার্টির_লোগো.svg.png" alt="জাতীয় নাগরিক পার্টি" width="16" height="16" style="vertical-align: middle;">
+                                        </p>
                                     </div>
                                 </div>
                                 <div class="vote-count">
@@ -376,10 +410,16 @@
                             </div>
                             <div class="candidate-result-item">
                                 <div class="candidate-info">
-                                    <div class="candidate-photo">👤</div>
+                                    <div class="candidate-photo">
+                                        <svg viewBox="0 0 24 24" fill="#757575" width="32" height="32">
+                                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                        </svg>
+                                    </div>
                                     <div>
                                         <h4>মোঃ রহিম</h4>
-                                        <p>বিএনপি - 🌾</p>
+                                        <p>বিএনপি - 
+                                            <img src="assets/images/dhan.png" alt="বিএনপি" width="16" height="16" style="vertical-align: middle;">
+                                        </p>
                                     </div>
                                 </div>
                                 <div class="vote-count">
@@ -395,13 +435,12 @@
 
                     <div class="form-actions">
                         <button class="btn btn-primary" onclick="calculateResults()">ফলাফল পুনর্গণনা করুন</button>
-                        <button class="btn btn-secondary" onclick="exportResults()">PDF হিসেবে রপ্তানি করুন</button>
+                        <button class="btn btn-secondary" onclick="exportResults()">PDF হিসেবে পাঠান</button>
                         <button class="btn btn-primary" onclick="publishResults()">ফলাফল প্রকাশ করুন</button>
                     </div>
                 </div>
             </section>
 
-            <!-- Complaints Section -->
             <section id="complaints-section" class="content-section">
                 <div class="section-header">
                     <h2>অভিযোগ ব্যবস্থাপনা</h2>
@@ -409,36 +448,12 @@
                 </div>
 
                 <div class="card">
-                    <div class="complaints-list">
-                        <div class="complaint-item">
-                            <div class="complaint-header">
-                                <h4>অভিযোগ #০০১</h4>
-                                <span class="badge badge-warning">অপেক্ষমান</span>
-                            </div>
-                            <p class="complaint-date">জমা: ৩ ডিসেম্বর ২০২৫, ২:৩০ PM</p>
-                            <p class="complaint-text">আমার ভোট সঠিকভাবে রেজিস্টার হয়নি। অনুগ্রহ করে যাচাই করুন।</p>
-                            <div class="complaint-meta">
-                                <span>এলাকা: ঢাকা-১</span>
-                                <span>ভোটার ID: ****5678</span>
-                            </div>
-                            <div class="form-group">
-                                <label>প্রশাসক মন্তব্য</label>
-                                <textarea rows="3" placeholder="আপনার প্রতিক্রিয়া লিখুন..."></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label>প্রমাণপত্র আপলোড করুন (যদি থাকে)</label>
-                                <input type="file" accept=".pdf,.jpg,.png">
-                            </div>
-                            <div class="complaint-actions">
-                                <button class="btn btn-sm btn-primary">সমাধান করুন</button>
-                                <button class="btn btn-sm btn-danger">প্রত্যাখ্যান করুন</button>
-                            </div>
-                        </div>
+                    <div class="complaints-list" id="complaints-list-container">
+                        <!-- Complaints will be loaded here dynamically -->
                     </div>
                 </div>
             </section>
 
-            <!-- Chat Section -->
             <section id="chat-section" class="content-section">
                 <div class="section-header">
                     <h2>নাগরিক চ্যাট</h2>
@@ -446,43 +461,17 @@
                 </div>
 
                 <div class="chat-container">
-                    <div class="chat-list card">
-                        <h3>চ্যাট তালিকা</h3>
-                        <div class="chat-item active">
-                            <div class="chat-avatar">👤</div>
-                            <div class="chat-info">
-                                <h4>নাগরিক #১২৩৪</h4>
-                                <p>শেষ বার্তা: ধন্যবাদ...</p>
-                            </div>
-                            <span class="unread-badge">২</span>
-                        </div>
-                        <div class="chat-item">
-                            <div class="chat-avatar">👤</div>
-                            <div class="chat-info">
-                                <h4>নাগরিক #৫৬৭৮</h4>
-                                <p>আমার ভোট...</p>
-                            </div>
-                        </div>
+                    <div class="chat-list card" id="chat-list-container">
+                        <!-- Chat list will be loaded here -->
                     </div>
 
                     <div class="chat-window card">
                         <div class="chat-header">
-                            <h3>নাগরিক #১২৩৪</h3>
-                            <span class="chat-status">অনলাইন</span>
+                            <h3 id="chat-header-name"></h3>
+                            <span class="chat-status" id="chat-header-status">অনলাইন</span>
                         </div>
-                        <div class="chat-messages">
-                            <div class="message user-message">
-                                <p>আমার ভোট কেন্দ্র কোথায়?</p>
-                                <span class="message-time">২:৩০ PM</span>
-                            </div>
-                            <div class="message admin-message">
-                                <p>আপনার NID অনুযায়ী আপনার ভোট কেন্দ্র হল ঢাকা সিটি কলেজ।</p>
-                                <span class="message-time">২:৩২ PM</span>
-                            </div>
-                            <div class="message user-message">
-                                <p>ধন্যবাদ!</p>
-                                <span class="message-time">২:৩৩ PM</span>
-                            </div>
+                        <div class="chat-messages" id="chat-messages-container">
+                            <!-- Chat messages will be loaded here -->
                         </div>
                         <div class="chat-input">
                             <input type="text" placeholder="বার্তা লিখুন..." id="chatMessage">
@@ -492,8 +481,7 @@
                 </div>
             </section>
 
-            <!-- Settings Section -->
-            <section id="settings-section" class="content-section">
+             <section id="settings-section" class="content-section">
                 <div class="section-header">
                     <h2>সেটিংস</h2>
                     <p>প্রশাসক অ্যাকাউন্ট ও সিস্টেম সেটিংস</p>
@@ -520,30 +508,15 @@
 
                 <div class="card mt-20">
                     <h3>প্রশাসক তথ্য</h3>
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <span class="info-label">প্রশাসক ID:</span>
-                            <span class="info-value">ADMIN-2025-001</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">নাম:</span>
-                            <span class="info-value">মোঃ রহিম</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">ইমেইল:</span>
-                            <span class="info-value">admin@nirapod-vote.gov.bd</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">শেষ লগইন:</span>
-                            <span class="info-value">৩ ডিসেম্বর ২০২৫, ৯:০০ AM</span>
-                        </div>
+                    <div class="info-grid" id="admin-info-container">
+                        <!-- Admin info will be loaded dynamically -->
                     </div>
                 </div>
             </section>
         </main>
     </div>
 
-    <!-- Candidate Details Modal -->
+    
     <div id="candidateModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -551,7 +524,7 @@
                 <span class="close-modal" onclick="closeCandidateModal()">&times;</span>
             </div>
             <div class="modal-body" id="candidateModalBody">
-                <!-- Content will be loaded dynamically -->
+                
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="closeCandidateModal()">বন্ধ করুন</button>
@@ -560,6 +533,7 @@
     </div>
 
     <script src="assets/js/common.js"></script>
+    <script src="assets/js/admin-mock-data.js"></script>
     <script src="assets/js/admin.js"></script>
 </body>
 </html>
