@@ -1,10 +1,9 @@
-// Citizen Dashboard JavaScript
-
-// Initialize dashboard
+    // Initialize dashboard
 document.addEventListener('DOMContentLoaded', function() {
     initializeDashboard();
     setupNavigationListeners();
     setupRealtimeFeatures();
+    setupMobileMenu();
     loadUserData();
     updateTimeRemaining();
 });
@@ -27,6 +26,17 @@ function initializeDashboard() {
     // Set active section from URL hash or default to voting
     const hash = window.location.hash.substring(1) || 'voting';
     showSection(hash);
+    
+    // Add Enter key listener for chat input
+    const chatInput = document.getElementById('chatInput');
+    if (chatInput) {
+        chatInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendChatMessage();
+            }
+        });
+    }
 }
 
 // Setup navigation listeners
@@ -80,6 +90,53 @@ function showSection(sectionName) {
     }
 }
 
+// Setup mobile menu
+function setupMobileMenu() {
+    const hamburger = document.getElementById('hamburgerMenu');
+    const sidebar = document.querySelector('.sidebar');
+    
+    if (hamburger && sidebar) {
+        // Close sidebar when nav item is clicked
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                closeSidebarMobile();
+            });
+        });
+        
+        // Close sidebar when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.sidebar') && !event.target.closest('.hamburger-menu')) {
+                closeSidebarMobile();
+            }
+        });
+    }
+}
+
+// Toggle sidebar visibility on mobile
+function toggleSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    if (sidebar) {
+        sidebar.classList.toggle('mobile-open');
+        const hamburger = document.getElementById('hamburgerMenu');
+        if (hamburger) {
+            hamburger.classList.toggle('active');
+        }
+    }
+}
+
+// Close sidebar on mobile
+function closeSidebarMobile() {
+    const sidebar = document.querySelector('.sidebar');
+    if (sidebar) {
+        sidebar.classList.remove('mobile-open');
+        const hamburger = document.getElementById('hamburgerMenu');
+        if (hamburger) {
+            hamburger.classList.remove('active');
+        }
+    }
+}
+
+
 // Get user data (simulate - in real app, get from server/session)
 function getUserData() {
     // In real application, this would fetch from session/localStorage
@@ -126,6 +183,7 @@ function submitVote(ballotId) {
     }
     
     const candidateValue = selectedCandidate.value;
+    const candidateLabel = selectedCandidate.closest('.candidate-card').querySelector('h4').textContent;
     
     // Confirm vote
     if (!confirm('আপনি কি নিশ্চিত আপনি এই প্রার্থীকে ভোট দিতে চান? ভোট দেওয়ার পর এটি পরিবর্তন করা যাবে না।')) {
@@ -144,7 +202,16 @@ function submitVote(ballotId) {
         //     body: JSON.stringify({ ballotId, candidateId: candidateValue })
         // })
         
-        showAlert('✅ আপনার ভোট সফলভাবে প্রদান করা হয়েছে! ধন্যবাদ।', 'success');
+        showAlert(' আপনার ভোট সফলভাবে প্রদান করা হয়েছে! ধন্যবাদ।', 'success');
+        
+        // Store voted candidate info for highlighting in results
+        const votedData = {
+            ballotId: ballotId,
+            candidateId: candidateValue,
+            candidateName: candidateLabel,
+            timestamp: getCurrentDateTime()
+        };
+        localStorage.setItem('votedCandidate_' + ballotId, JSON.stringify(votedData));
         
         // Update UI to show voted state
         const ballotCard = selectedCandidate.closest('.ballot-card');
@@ -164,6 +231,7 @@ function submitVote(ballotId) {
         setTimeout(() => {
             if (confirm('ফলাফল দেখতে চান?')) {
                 showSection('results');
+                highlightUserVote();
             }
         }, 2000);
         
@@ -176,6 +244,29 @@ function getCurrentDateTime() {
     const date = now.toLocaleDateString('bn-BD');
     const time = now.toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' });
     return `${date}, ${time}`;
+}
+
+// Highlight user's voted candidate in results
+function highlightUserVote() {
+    // Get voted candidate data from localStorage
+    const votedData = localStorage.getItem('votedCandidate_1'); // ballotId = 1 for national parliament
+    if (!votedData) return;
+    
+    const { candidateName } = JSON.parse(votedData);
+    
+    // Find and highlight the matching candidate in results
+    const resultItems = document.querySelectorAll('.result-item');
+    resultItems.forEach(item => {
+        const itemName = item.querySelector('h4').textContent;
+        if (itemName === candidateName) {
+            item.classList.add('user-voted');
+            // Add badge
+            const badge = document.createElement('span');
+            badge.className = 'voted-badge';
+            badge.textContent = '✓ আপনার ভোট';
+            item.querySelector('.result-info').appendChild(badge);
+        }
+    });
 }
 
 // ============= DISCUSSION FUNCTIONS =============
@@ -345,7 +436,7 @@ function submitComplaint(event) {
         //     body: JSON.stringify({ text: complaintText, anonymous: isAnonymous })
         // })
         
-        showAlert('✅ আপনার অভিযোগ সফলভাবে জমা দেওয়া হয়েছে। প্রশাসক শীঘ্রই এটি পর্যালোচনা করবেন।', 'success');
+        showAlert(' আপনার অভিযোগ সফলভাবে জমা দেওয়া হয়েছে। প্রশাসক শীঘ্রই এটি পর্যালোচনা করবেন।', 'success');
         
         // Clear form
         document.getElementById('complaintForm').reset();
@@ -408,14 +499,13 @@ function changePassword(event) {
         //     body: JSON.stringify({ currentPassword, newPassword })
         // })
         
-        showAlert('✅ পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে', 'success');
+        showAlert(' পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে', 'success');
         
         // Clear form
         document.getElementById('passwordForm').reset();
         
     }, 1500);
 }
-
 // ============= UTILITY FUNCTIONS =============
 
 // Escape HTML to prevent XSS
@@ -491,8 +581,8 @@ const candidateData = {
     1: {
         name: "মোঃ আবদুল্লাহ",
         party: "জাতীয় নাগরিক পার্টি (এনসিপি)",
-        symbol: "assets/images/symbol1.png", // Placeholder
-        photo: "https://via.placeholder.com/150",
+        symbol: "assets/images/bodna.jpg",
+        photo: "assets/images/Tamim.jpeg",
         bio: "মোঃ আবদুল্লাহ একজন অভিজ্ঞ রাজনীতিবিদ যিনি গত ২০ বছর ধরে জনসেবায় নিয়োজিত আছেন। তিনি ঢাকা বিশ্ববিদ্যালয় থেকে রাষ্ট্রবিজ্ঞানে স্নাতকোত্তর ডিগ্রি অর্জন করেছেন।",
         manifesto: [
             "শিক্ষার মান উন্নয়ন ও ডিজিটাল শিক্ষা ব্যবস্থা প্রবর্তন",
@@ -510,8 +600,8 @@ const candidateData = {
     2: {
         name: "সালমা খাতুন",
         party: "জনকল্যাণ পার্টি",
-        symbol: "assets/images/symbol2.png", // Placeholder
-        photo: "https://via.placeholder.com/150",
+        symbol: "assets/images/honey-bee.jpg", 
+        photo: "assets/images/Saima_apu.jpeg",
         bio: "সালমা খাতুন একজন সমাজকর্মী ও নারী অধিকার নেত্রী। তিনি তৃণমূল পর্যায় থেকে রাজনীতিতে উঠে এসেছেন এবং নারীদের ক্ষমতায়নে কাজ করছেন।",
         manifesto: [
             "নারীদের জন্য নিরাপদ কর্মপরিবেশ নিশ্চিত করা",
@@ -529,8 +619,8 @@ const candidateData = {
     3: {
         name: "রহিম উদ্দিন",
         party: "স্বাধীন প্রার্থী",
-        symbol: "assets/images/symbol3.png", // Placeholder
-        photo: "https://via.placeholder.com/150",
+        symbol: "assets/images/ant.jpg", 
+        photo: "assets/images/Taz.jpg",
         bio: "রহিম উদ্দিন একজন সফল ব্যবসায়ী ও সমাজসেবক। তিনি কোনো রাজনৈতিক দলের সাথে যুক্ত নন এবং স্বতন্ত্রভাবে জনগণের সেবা করতে চান।",
         manifesto: [
             "স্থানীয় অবকাঠামো উন্নয়ন",
@@ -572,7 +662,6 @@ function openCandidateModal(candidateId) {
             <div class="candidate-profile-info">
                 <h3>${candidate.name}</h3>
                 <div class="candidate-party-info">
-                    <img src="https://via.placeholder.com/40" alt="প্রতীক" class="party-symbol-small">
                     <strong>${candidate.party}</strong>
                 </div>
             </div>
@@ -605,6 +694,168 @@ function openCandidateModal(candidateId) {
 function closeCandidateModal() {
     const modal = document.getElementById('candidateModal');
     modal.style.display = "none";
+}
+
+// ============= FOUR STATES OF UI =============
+
+// Show Alert (Success, Error, Warning, Info)
+function showAlert(message, type = 'info') {
+    const alertContainer = document.getElementById('alertContainer');
+    if (!alertContainer) return;
+
+    const icons = {
+        success: '✓',
+        error: '✕',
+        warning: '⚠',
+        info: 'ℹ'
+    };
+
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${type}`;
+    alert.innerHTML = `
+        <span class="alert-icon">${icons[type]}</span>
+        <span>${message}</span>
+    `;
+
+    alertContainer.appendChild(alert);
+
+    // Auto remove after 4 seconds
+    setTimeout(() => {
+        alert.classList.add('fade-out');
+        setTimeout(() => alert.remove(), 300);
+    }, 4000);
+}
+
+// Show Loading State
+function showLoadingState(container, type = 'ballot') {
+    if (!container) return;
+    
+    let skeletonHtml = '';
+    if (type === 'ballot') {
+        skeletonHtml = '<div class="skeleton-item skeleton-ballot"></div>';
+    } else if (type === 'result') {
+        skeletonHtml = '<div class="skeleton-item skeleton-result"></div>';
+    }
+    
+    container.innerHTML = skeletonHtml;
+    container.classList.add('is-loading');
+}
+
+// Hide Loading State
+function hideLoadingState(container) {
+    if (!container) return;
+    container.classList.remove('is-loading');
+}
+
+// Show Empty State
+function showEmptyState(container, icon, title, message, buttonText = null, onButtonClick = null) {
+    if (!container) return;
+    
+    let buttonHtml = '';
+    if (buttonText && onButtonClick) {
+        buttonHtml = `<button class="btn btn-primary" onclick="${onButtonClick}">${buttonText}</button>`;
+    }
+    
+    container.innerHTML = `
+        <div class="empty-state">
+            <div class="empty-state-icon">${icon}</div>
+            <h3>${title}</h3>
+            <p>${message}</p>
+            ${buttonHtml}
+        </div>
+    `;
+}
+
+// Validate Form Input
+function validateInput(input, type = 'text') {
+    if (!input) return false;
+    
+    const value = input.value.trim();
+    let errorMsg = '';
+    
+    if (type === 'email') {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(value)) {
+            errorMsg = 'বৈধ ইমেইল প্রবেশ করুন';
+        }
+    } else if (type === 'phone') {
+        const phoneRegex = /^[0-9]{11}$/;
+        if (!phoneRegex.test(value)) {
+            errorMsg = '১১ সংখ্যার ফোন নম্বর প্রবেশ করুন';
+        }
+    } else if (type === 'password') {
+        if (value.length < 8) {
+            errorMsg = 'পাসওয়ার্ড কমপক্ষে ৮ অক্ষর হতে হবে';
+        }
+    } else if (type === 'required') {
+        if (!value) {
+            errorMsg = 'এই ক্ষেত্র পূরণ করা আবশ্যক';
+        }
+    }
+    
+    if (errorMsg) {
+        input.classList.add('error');
+        let errorDiv = input.nextElementSibling;
+        if (!errorDiv || !errorDiv.classList.contains('form-error')) {
+            errorDiv = document.createElement('div');
+            errorDiv.className = 'form-error';
+            input.parentNode.insertBefore(errorDiv, input.nextSibling);
+        }
+        errorDiv.textContent = errorMsg;
+        errorDiv.style.display = 'block';
+        return false;
+    } else {
+        input.classList.remove('error');
+        const errorDiv = input.nextElementSibling;
+        if (errorDiv && errorDiv.classList.contains('form-error')) {
+            errorDiv.style.display = 'none';
+        }
+        return true;
+    }
+}
+
+// Check Password Strength
+function checkPasswordStrength(password) {
+    let strength = 'weak';
+    if (password.length >= 8) {
+        const hasUpperCase = /[A-Z]/.test(password);
+        const hasLowerCase = /[a-z]/.test(password);
+        const hasNumbers = /[0-9]/.test(password);
+        const hasSpecial = /[!@#$%^&*]/.test(password);
+        
+        if (hasUpperCase && hasLowerCase && hasNumbers) {
+            strength = 'medium';
+        }
+        if (hasUpperCase && hasLowerCase && hasNumbers && hasSpecial) {
+            strength = 'strong';
+        }
+    }
+    return strength;
+}
+
+// Show Success Animation
+function showSuccessAnimation(element) {
+    if (!element) return;
+    element.classList.add('success-animation');
+    setTimeout(() => element.classList.remove('success-animation'), 600);
+}
+
+// Handle Network Error
+function handleNetworkError() {
+    showAlert('নেটওয়ার্ক সংযোগ ব্যর্থ। অনুগ্রহ করে আপনার ইন্টারনেট সংযোগ পরীক্ষা করুন।', 'error');
+}
+
+// Handle Server Error
+function handleServerError(statusCode) {
+    const messages = {
+        400: 'অনুরোধটি বৈধ নয়। অনুগ্রহ করে আপনার তথ্য পরীক্ষা করুন।',
+        401: 'আপনার সেশন শেষ হয়েছে। অনুগ্রহ করে আবার লগইন করুন।',
+        403: 'আপনার এই কাজটি করার অনুমতি নেই।',
+        404: 'অনুরোধকৃত রিসোর্স পাওয়া যায়নি।',
+        500: 'সার্ভার ত্রুটি। অনুগ্রহ করে কিছু সময় পর আবার চেষ্টা করুন।'
+    };
+    const message = messages[statusCode] || 'একটি ত্রুটি ঘটেছে। অনুগ্রহ করে পরে চেষ্টা করুন।';
+    showAlert(message, 'error');
 }
 
 // Close modal when clicking outside

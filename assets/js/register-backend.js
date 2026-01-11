@@ -1,4 +1,4 @@
-// Register page JavaScript with UI States
+// Register page JavaScript - Backend Connected Version
 
 document.addEventListener('DOMContentLoaded', function() {
     const registerForm = document.getElementById('registerForm');
@@ -19,33 +19,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
-
-/* ===========================
-   REGISTERED USERS STORAGE
-   =========================== */
-
-// Get all registered users
-function getRegisteredUsers() {
-    const users = localStorage.getItem('nirapodh_users');
-    return users ? JSON.parse(users) : {};
-}
-
-// Save user credentials
-function saveUserCredentials(nid, password) {
-    const users = getRegisteredUsers();
-    users[nid] = {
-        nid: nid,
-        password: password,
-        registeredAt: new Date().toISOString()
-    };
-    localStorage.setItem('nirapodh_users', JSON.stringify(users));
-}
-
-// Check if user exists
-function userExists(nid) {
-    const users = getRegisteredUsers();
-    return users.hasOwnProperty(nid);
-}
 
 /* ===========================
    UI STATE MANAGEMENT
@@ -188,7 +161,8 @@ function validateRegisterForm() {
     return errors;
 }
 
-function handleRegister(e) {
+// Handle Register Form Submit
+async function handleRegister(e) {
     e.preventDefault();
     
     // Validate form
@@ -200,55 +174,38 @@ function handleRegister(e) {
     }
 
     const nid = document.getElementById('nid').value.trim();
+    const dob = document.getElementById('dob').value;
     
-    // Check if user already exists
-    if (userExists(nid)) {
-        showAlert('এই NID দিয়ে ইতিমধ্যে একটি অ্যাকাউন্ট রয়েছে। লগইন করতে যান।', 'error', '✗ ত্রুটি');
-        return;
-    }
+    // Store NID and DOB temporarily for signup page
+    sessionStorage.setItem('registeringNid', nid);
+    sessionStorage.setItem('registeringDob', dob);
     
-    // Show loading state
+    // Show success message and redirect to signup
     showLoadingState();
-
-    // Simulate API call
+    
     setTimeout(() => {
-        // Save registration (simulate 80% success rate)
-        const isSuccess = Math.random() > 0.2; // 80% success rate
-
-        if (isSuccess) {
-            hideLoadingState();
-            
-            // Initialize user with NID (password will be set later in signup)
-            const tempPassword = 'TempPass@123';
-            saveUserCredentials(nid, tempPassword);
-            
-            // Store NID in sessionStorage for signup page
-            sessionStorage.setItem('registeringNid', nid);
-            
-            const alertContainer = document.getElementById('alertContainer');
-            if (alertContainer) {
-                alertContainer.innerHTML = `
-                    <div class="alert alert-success">
-                        <div class="alert-icon">
-                            <i class="fa-solid fa-circle-check"></i>
-                        </div>
-                        <div class="alert-content">
-                            <div class="alert-title">✓ নিবন্ধন সফল!</div>
-                            <div class="alert-message">আপনার পাসওয়ার্ড তৈরি করতে সাইনআপ পেজে যাচ্ছেন...</div>
-                        </div>
+        hideLoadingState();
+        
+        const alertContainer = document.getElementById('alertContainer');
+        if (alertContainer) {
+            alertContainer.innerHTML = `
+                <div class="alert alert-success">
+                    <div class="alert-icon">
+                        <i class="fa-solid fa-circle-check"></i>
                     </div>
-                `;
-            }
-
-            // Redirect after 2 seconds
-            setTimeout(() => {
-                window.location.href = 'signup.html';
-            }, 2000);
-        } else {
-            hideLoadingState();
-            showAlert('নেটওয়ার্ক ত্রুটি। অনুগ্রহ করে পুনরায় চেষ্টা করুন।', 'error', '✗ ত্রুটি');
+                    <div class="alert-content">
+                        <div class="alert-title">✓ যাচাই সফল!</div>
+                        <div class="alert-message">আপনার অ্যাকাউন্ট সম্পূর্ণ করতে সাইনআপ পেজে যাচ্ছেন...</div>
+                    </div>
+                </div>
+            `;
         }
-    }, 2000);
+
+        // Redirect to signup page
+        setTimeout(() => {
+            window.location.href = 'signup.html';
+        }, 1500);
+    }, 1000);
 }
 
 function simulateAutoFetch() {

@@ -1,0 +1,74 @@
+.
+├── admin-dashboard.html
+├── admin-login.html
+├── assets
+│   ├── css
+│   │   ├── admin.css
+│   │   ├── auth.css
+│   │   ├── citizen_chat.css
+│   │   ├── citizen-dashboard.css
+│   │   ├── common.css
+│   │   └── index.css
+│   ├── images
+│   │   ├── ant.jpg
+│   │   ├── bodna.jpg
+│   │   ├── dhan.png
+│   │   ├── donald_trump.jpg
+│   │   ├── election_comission_logo-removebg-preview.png
+│   │   ├── election_commision_white_bg.png
+│   │   ├── Government_Seal_of_Bangladesh.svg
+│   │   ├── hasnat.jpg
+│   │   ├── honey-bee.jpg
+│   │   ├── powerful-symbol-unity-anti-corruption-day_968957-12635.avif
+│   │   ├── putin.jpg
+│   │   ├── Saima_apu.jpeg
+│   │   ├── salma_khatun.jpg
+│   │   ├── shapla.jpg
+│   │   ├── Tamim.jpeg
+│   │   ├── Taz.jpg
+│   │   ├── WhatsApp Image 2025-12-27 at 11.35.15 PM.jpeg
+│   │   └── জাতীয়_নাগরিক_পার্টির_লোগো.svg.png
+│   └── js
+│       ├── admin.js
+│       ├── admin-login-backend.js
+│       ├── admin-login.js
+│       ├── admin-mock-data.js
+│       ├── api-config.js
+│       ├── citizen_chat.js
+│       ├── citizen-dashboard-backend.js
+│       ├── citizen-dashboard.js
+│       ├── common.js
+│       ├── index.js
+│       ├── login-backend.js
+│       ├── login.js
+│       ├── register-backend.js
+│       ├── register.js
+│       ├── server.js
+│       ├── signup-backend.js
+│       └── signup.js
+├── BACKEND_README.md
+├── citizen-dashboard.html
+├── index.html
+├── INTEGRATION_SUMMARY.md
+├── login.html
+├── package.json
+├── package-lock.json
+├── project_structure.txt
+├── QUICK_START.md
+├── README.md
+├── register.html
+├── server
+│   ├── config
+│   │   └── db.js
+│   ├── models
+│   │   ├── Admin.js
+│   │   ├── User.js
+│   │   └── Vote.js
+│   └── routes
+│       ├── admin.js
+│       ├── auth.js
+│       └── vote.js
+├── server.js
+└── signup.html
+
+9 directories, 63 files
