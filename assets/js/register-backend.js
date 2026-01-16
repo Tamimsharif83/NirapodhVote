@@ -2,6 +2,8 @@
 
 console.log('🔍 register-backend.js loaded');
 
+let isSubmitting = false; // Prevent double submission
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🔍 DOM loaded, setting up form handler');
     const registerForm = document.getElementById('registerForm');
@@ -14,17 +16,18 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('✅ Form found, attaching submit handler');
     
     registerForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (isSubmitting) {
+            console.log('⚠️ Form already submitting, ignoring double click');
+            return;
+        }
+
         console.log('🎯 FORM SUBMIT EVENT TRIGGERED!');
         handleRegister(e);
     });
     
-    // Also add click handler to button as backup
-    const submitBtn = document.getElementById('submitBtn');
-    if (submitBtn) {
-        submitBtn.addEventListener('click', function(e) {
-            console.log('🎯 BUTTON CLICK EVENT TRIGGERED!');
-        });
-    }
+    // Remove the click handler on submitBtn as it might be redundant or confusing
     
     console.log('✅ Setup complete');
 });
@@ -33,8 +36,9 @@ document.addEventListener('DOMContentLoaded', function() {
  * Handle the initial registration - Send OTP
  */
 async function handleRegister(e) {
-    e.preventDefault();
+    // e.preventDefault(); // Already called in listener
     
+    isSubmitting = true;
     console.log('=== Register Form Submitted ===');
     
     // Get form values
@@ -48,12 +52,14 @@ async function handleRegister(e) {
     if (!nid || !phoneNumber || !dob) {
         console.log('Validation failed: Missing fields');
         showAlert('সকল তথ্য প্রদান করুন', 'error');
+        isSubmitting = false; // Reset flag
         return;
     }
     
     if (nid.length < 10) {
         console.log('Validation failed: Invalid NID length');
         showAlert('বৈধ NID নম্বর প্রদান করুন', 'error');
+        isSubmitting = false; // Reset flag
         return;
     }
     
@@ -95,6 +101,7 @@ async function handleRegister(e) {
     } finally {
         console.log('Removing button loading state...');
         setButtonLoading('submitBtn', false);
+        isSubmitting = false; // Reset flag so user can try again
     }
 }
 

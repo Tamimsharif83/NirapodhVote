@@ -20,7 +20,7 @@ const userSchema = new mongoose.Schema({
     trim: true
   },
   dob: {
-    type: Date,
+    type: String,
     required: true
   },
   fatherName: {
@@ -33,7 +33,7 @@ const userSchema = new mongoose.Schema({
   },
   permanentAddress: {
     type: String,
-    required: true
+    required: false
   },
   presentAddress: {
     type: String,

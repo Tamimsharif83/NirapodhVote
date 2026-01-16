@@ -1,6 +1,5 @@
-// OTP Verification JavaScript with Backend + Firebase hybrid mode
+// OTP Verification JavaScript with SMS Only mode
 
-let useFirebase = false; // Will be set based on backend config
 let firebaseOTPSent = false;
 let backendOTPSent = false;
 
@@ -26,24 +25,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         document.getElementById('expiryTime').textContent = expiresIn;
     }
 
-    // Check OTP Mode (Firebase vs Backend)
-    try {
-        const response = await fetch(`${API_BASE_URL}/auth/firebase-config`);
-        const data = await response.json();
-        
-        if (data.success && data.useFirebase) {
-            console.log('🔥 Firebase Mode Enabled');
-            useFirebase = true;
-            initializeFirebaseMode();
-        } else {
-            console.log('🤖 Backend Mode Enabled');
-            useFirebase = false;
-            initializeBackendMode();
-        }
-    } catch (error) {
-        console.error('Failed to strict check OTP mode, defaulting to Backend Mode', error);
-        initializeBackendMode();
-    }
+    // Initialize SMS Mode directly
+    initializeBackendMode();
     
     const otpForm = document.getElementById('otpForm');
     if (otpForm) {
@@ -57,48 +40,20 @@ async function initializeBackendMode() {
     if (infoBox) {
         // Remove existing backend info if any to avoid duplicates
         const existingInfo = document.getElementById('backendModeInfo');
-        if (!existingInfo) {
-            infoBox.innerHTML += `<p id="backendModeInfo" style="color: #4CAF50; font-size: 0.9em; margin-top: 5px;"><i class="fa-solid fa-info-circle"></i> ব্যাকএন্ড মোড: কনসোলে OTP দেখুন (F12)</p>`;
+        if (existingInfo) {
+            existingInfo.remove(); // Clean up old text if present
         }
     }
 
-    // Auto-send backend OTP
-    console.log('📱 Auto-sending backend OTP...');
-    await sendBackendOTP();
+    // DO NOT Auto-send backend OTP here !!
+    // Because register.html already triggered the send-otp API before redirecting.
+    // Sending it again here causes the double OTP issue.
+    console.log('✅ Page ready for OTP entry');
+    backendOTPSent = true; // Assume previous step sent it
 }
 
-async function initializeFirebaseMode() {
-    // Show Firebase specific UI
-    const infoBox = document.querySelector('.info-box');
-    if (infoBox) {
-        infoBox.innerHTML += `<p style="color: #ff6b6b; font-size: 0.9em; margin-top: 5px;"><i class="fa-solid fa-exclamation-triangle"></i> দৈনিক ১০টি SMS লিমিট</p>`;
-    }
+// Old Firebase functions removed
 
-    document.getElementById('otpForm').style.display = 'none';
-    const sendBtn = document.getElementById('sendOtpBtn');
-    if (sendBtn) sendBtn.style.display = 'block';
-    
-    const recaptchaContainer = document.getElementById('recaptcha-container');
-    if (recaptchaContainer) recaptchaContainer.style.display = 'flex';
-
-    // Wait for Firebase to initialize
-    console.log('⏳ Waiting for Firebase initialization...');
-    let retries = 0;
-    while (!window.firebasePhoneAuth && retries < 20) {
-        await new Promise(resolve => setTimeout(resolve, 500));
-        retries++;
-    }
-    
-    if (window.firebasePhoneAuth) {
-        console.log('✅ Firebase ready');
-        setTimeout(() => {
-            setupFirebaseRecaptcha();
-        }, 500);
-    } else {
-        console.error('❌ Firebase not loaded');
-        showAlert('Firebase লোড হয়নি। পেজ রিফ্রেশ করুন', 'error');
-    }
-}
 
 /**
  * Send OTP via Backend API
@@ -258,87 +213,46 @@ async function handleVerifyOTP(e) {
     setButtonLoading('submitBtn', true);
     
     try {
-        // Firebase Mode Verification
-        if (useFirebase) {
-            console.log('🔥 Verifying with Firebase...');
-            if (!window.firebasePhoneAuth) {
-                throw new Error('Firebase not initialized');
-            }
-            
-            const firebaseResult = await window.firebasePhoneAuth.verifyOTP(otpCode);
-            
-            if (!firebaseResult.success) {
-                console.error('❌ Firebase verification failed:', firebaseResult.message);
-                showAlert(firebaseResult.message || 'OTP যাচাইকরণ ব্যর্থ', 'error');
-                setButtonLoading('submitBtn', false);
-                return;
-            }
-            
-            console.log('✅ Firebase OTP verified!');
-            // After successful Firebase verify, we still need to register in backend
-            // Note: Backend might need to know we bypassed its OTP check or we send a flag?
-            // Actually, backend expects an OTP that matches database.
-            // If we use Firebase, backend doesn't have the OTP record unless we told it "skip otp check" or "firebase verified".
-            // BUT, for now, if useFirebase is true, we probably need a way to tell backend "I verified this user via Firebase, please trust me".
-            // OR, the backend auth API for 'VERIFY_OTP_REGISTER' needs to handle Firebase tokens.
-            // Given the current setup, if we use Firebase, the backend OTP (OTP model) won't match because we didn't generate one in backend.
-            // Wait, sendBackendOTP (which generates backend OTP record) IS NOT CALLED in Firebase mode.
-            // So backend has NO OTP record for this user.
-            // So 'VERIFY_OTP_REGISTER' will FAIL saying "OTP not found".
-            
-            // FIXME: We need to modify backend 'VERIFY_OTP_REGISTER' to accept Firebase verification or just "this is verified" if securely possible.
-            // For now, let's assume we stick to backend mode or user has to solve this.
-            // Actually, a simple workaround is:
-            // If Firebase verify success, we call a special backend endpoint or pass a flag?
-            // No, better: The backend logic for VERIFY_OTP_REGISTER checks `OTP.findOne`.
-            // If we are in Firebase mode, we should probably update backend to respect that.
-            // Or easier: When using Firebase, we still need to call something on backend to create the user.
-            
-            // Let's rely on the user having Backend Mode enabled for now as "it works".
-            // If they really want Firebase, they'd need to update backend to verify Firebase ID token.
-            // But let's proceed with just getting the logic in place on frontend.
-        }
-
-        // Verify OTP and register with backend
-        console.log('📤 Verifying with backend...');
+        /* 
+           BACKEND MODE VERIFICATION (SMS)
+           We send the OTP code entered by user to the backend.
+           The backend checks against the database record it created when SMS was sent.
+        */
+        console.log('🤖 Verifying with Backend...');
+        
         const response = await apiRequest('VERIFY_OTP_REGISTER', 'POST', {
             nid,
             otp: otpCode,
             password,
-            presentAddress,
-            // Pass a flag if we verified via Firebase?
-            // The backend doesn't currently support this.
-            // But let's keep the code structure.
+            presentAddress
         });
-
         
         if (response.success) {
-            console.log('✅ Backend verification successful');
+            console.log('✅ Backend verification & registration successful');
+            showAlert('রেজিস্ট্রেশন সফল! লগইন পেজে নিয়ে যাওয়া হচ্ছে...', 'success');
             
-            // Save token and user data
-            saveAuthToken(response.token);
-            saveUserData(response.user);
-            
-            // Clear session storage
+            // Clear session data
             sessionStorage.removeItem('otp_nid');
             sessionStorage.removeItem('otp_phone');
             sessionStorage.removeItem('otp_dob');
             sessionStorage.removeItem('otp_expires');
             
-            showAlert('নিবন্ধন সফল হয়েছে! ড্যাশবোর্ডে পাঠানো হচ্ছে...', 'success');
+            // Save token and user info
+            localStorage.setItem('token', response.token);
+            localStorage.setItem('user', JSON.stringify(response.user));
             
-            // Redirect to citizen dashboard
+            // Redirect to dashboard or login
             setTimeout(() => {
                 window.location.href = 'citizen-dashboard.html';
-            }, 1500);
+            }, 2000);
         } else {
             console.error('❌ Backend verification failed:', response.message);
-            showAlert(response.message || 'OTP যাচাইকরণ ব্যর্থ', 'error');
+            showAlert(response.message || 'OTP ভুল হয়েছে অথবা মেয়াদোত্তীর্ণ', 'error');
+            setButtonLoading('submitBtn', false);
         }
     } catch (error) {
         console.error('❌ OTP verification error:', error);
-        showAlert('সার্ভার ত্রুটি। আবার চেষ্টা করুন', 'error');
-    } finally {
+        showAlert('যাচাইকরণে সমস্যা হয়েছে। আবার চেষ্টা করুন', 'error');
         setButtonLoading('submitBtn', false);
     }
 }
@@ -348,12 +262,7 @@ async function handleVerifyOTP(e) {
  */
 async function resendOTP() {
     console.log('🔄 Resending OTP...');
-    
-    if (useFirebase) {
-        return resendFirebaseOTP();
-    } else {
-        return resendBackendOTP();
-    }
+    return resendBackendOTP();
 }
 
 async function resendBackendOTP() {

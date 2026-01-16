@@ -18,12 +18,12 @@ const preregisteredCitizenSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
-  electionArea: {
+  votingArea: {
     type: String,
     required: true
   },
   dob: {
-    type: Date,
+    type: String,
     required: true
   },
   fatherName: {
@@ -36,7 +36,7 @@ const preregisteredCitizenSchema = new mongoose.Schema({
   },
   permanentAddress: {
     type: String,
-    required: true
+    required: false
   },
   hasRegistered: {
     type: Boolean,
@@ -53,4 +53,4 @@ const preregisteredCitizenSchema = new mongoose.Schema({
   }
 });
 
-module.exports = mongoose.model('PreregisteredCitizen', preregisteredCitizenSchema, 'preregisteredcitizens');
+module.exports = mongoose.model('PreregisteredCitizen', preregisteredCitizenSchema, 'preregistered');
