@@ -1,6 +1,12 @@
-// OTP Verification JavaScript
+// OTP Verification JavaScript with Backend + Firebase hybrid mode
 
-document.addEventListener('DOMContentLoaded', function() {
+let useFirebase = false; // Will be set based on backend config
+let firebaseOTPSent = false;
+let backendOTPSent = false;
+
+document.addEventListener('DOMContentLoaded', async function() {
+    console.log('🚀 OTP Verification Page Loaded');
+    
     // Check if OTP session data exists
     const nid = sessionStorage.getItem('otp_nid');
     const phone = sessionStorage.getItem('otp_phone');
@@ -20,6 +26,10 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('expiryTime').textContent = expiresIn;
     }
     
+    // Auto-send backend OTP on page load
+    console.log('📱 Auto-sending backend OTP...');
+    await sendBackendOTP();
+    
     const otpForm = document.getElementById('otpForm');
     if (otpForm) {
         otpForm.addEventListener('submit', handleVerifyOTP);
@@ -27,25 +37,146 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 /**
+ * Send OTP via Backend API
+ */
+async function sendBackendOTP() {
+    console.log('📤 Sending backend OTP...');
+    
+    const nid = sessionStorage.getItem('otp_nid');
+    const phone = sessionStorage.getItem('otp_phone');
+    
+    if (!nid || !phone) {
+        showAlert('সেশন ডেটা পাওয়া যায়নি', 'error');
+        return false;
+    }
+    
+    try {
+        const response = await apiRequest('SEND_OTP', 'POST', {
+            nid,
+            phoneNumber: phone
+        });
+        
+        if (response.success) {
+            console.log('✅ Backend OTP sent successfully');
+            console.log('🔑 OTP Code:', response.data.devOtp || 'Check backend console');
+            
+            backendOTPSent = true;
+            
+            // Show OTP form
+            document.getElementById('otpForm').style.display = 'block';
+            const sendBtn = document.getElementById('sendOtpBtn');
+            if (sendBtn) sendBtn.style.display = 'none';
+            
+            // Show OTP in alert for easy testing
+            if (response.data.devOtp) {
+                showAlert(`OTP পাঠানো হয়েছে! টেস্টিং OTP: ${response.data.devOtp}`, 'success', '✓ সফল', 8000);
+            } else {
+                showAlert('OTP পাঠানো হয়েছে! ব্যাকএন্ড কনসোল চেক করুন', 'success');
+            }
+            
+            return true;
+        } else {
+            console.error('❌ Backend OTP failed:', response.message);
+            showAlert(response.message || 'OTP পাঠাতে ব্যর্থ', 'error');
+            return false;
+        }
+    } catch (error) {
+        console.error('❌ Error sending backend OTP:', error);
+        showAlert('সার্ভার ত্রুটি। আবার চেষ্টা করুন', 'error');
+        return false;
+    }
+}
+
+// Make function global for onclick handler
+window.sendBackendOTP = sendBackendOTP;
+
+/**
+ * Setup Firebase reCAPTCHA (optional, only if Firebase mode enabled)
+ */
+function setupFirebaseRecaptcha() {
+    console.log('🔒 Setting up Firebase reCAPTCHA...');
+    
+    if (window.firebasePhoneAuth) {
+        const success = window.firebasePhoneAuth.setupRecaptcha('recaptcha-container');
+        if (success) {
+            console.log('✅ reCAPTCHA ready');
+            showAlert('reCAPTCHA প্রস্তুত। এখন OTP পাঠাতে পারেন', 'success', '✓ প্রস্তুত', 3000);
+        } else {
+            console.error('❌ reCAPTCHA setup failed');
+            showAlert('reCAPTCHA সেটআপ ব্যর্থ। পেজ রিফ্রেশ করুন', 'error');
+        }
+    }
+}
+
+/**
+ * Send OTP via Firebase
+ */
+async function sendFirebaseOTP() {
+    console.log('📱 Send OTP button clicked');
+    
+    const phone = sessionStorage.getItem('otp_phone');
+    if (!phone) {
+        showAlert('ফোন নম্বর পাওয়া যায়নি', 'error');
+        return;
+    }
+    
+    // Show loading
+    setButtonLoading('sendOtpBtn', true, 'sendBtnText', 'sendBtnLoader');
+    
+    try {
+        console.log('🔥 Sending Firebase OTP...');
+        const result = await window.firebasePhoneAuth.sendOTP(phone);
+        
+        if (result.success) {
+            console.log('✅ Firebase OTP sent successfully');
+            firebaseOTPSent = true;
+            
+            // Hide send button and show OTP form
+            document.getElementById('sendOtpBtn').style.display = 'none';
+            document.getElementById('otpForm').style.display = 'block';
+            
+            showAlert('OTP আপনার ফোনে পাঠানো হয়েছে! (১০ মেসেজ লিমিট)', 'success', '✓ সফল');
+        } else {
+            console.error('❌ Firebase OTP failed:', result.message);
+            showAlert(result.message || 'OTP পাঠাতে ব্যর্থ', 'error');
+            
+            // Reset reCAPTCHA on failure
+            window.firebasePhoneAuth.resetRecaptcha();
+            setTimeout(() => setupFirebaseRecaptcha(), 1000);
+        }
+    } catch (error) {
+        console.error('❌ Error sending Firebase OTP:', error);
+        showAlert('OTP পাঠাতে ত্রুটি হয়েছে', 'error');
+    } finally {
+        setButtonLoading('sendOtpBtn', false, 'sendBtnText', 'sendBtnLoader');
+    }
+}
+
+// Make function global
+window.sendFirebaseOTP = sendFirebaseOTP;
+
+/**
  * Handle OTP verification and registration
  */
 async function handleVerifyOTP(e) {
     e.preventDefault();
     
+    console.log('🔐 Verifying OTP...');
+    
     // Get form values
     const nid = sessionStorage.getItem('otp_nid');
-    const otp = document.getElementById('otp').value.trim();
+    const otpCode = document.getElementById('otp').value.trim();
     const password = document.getElementById('password').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
     const presentAddress = document.getElementById('presentAddress').value.trim();
     
     // Validation
-    if (!otp || !password || !presentAddress) {
+    if (!otpCode || !password || !presentAddress) {
         showAlert('সকল তথ্য প্রদান করুন', 'error');
         return;
     }
     
-    if (otp.length !== 6) {
+    if (otpCode.length !== 6) {
         showAlert('৬ সংখ্যার OTP প্রদান করুন', 'error');
         return;
     }
@@ -63,15 +194,18 @@ async function handleVerifyOTP(e) {
     setButtonLoading('submitBtn', true);
     
     try {
-        // Verify OTP and register
+        // Verify OTP and register with backend
+        console.log('📤 Verifying with backend...');
         const response = await apiRequest('VERIFY_OTP_REGISTER', 'POST', {
             nid,
-            otp,
+            otp: otpCode,
             password,
             presentAddress
         });
         
         if (response.success) {
+            console.log('✅ Backend verification successful');
+            
             // Save token and user data
             saveAuthToken(response.token);
             saveUserData(response.user);
@@ -89,10 +223,11 @@ async function handleVerifyOTP(e) {
                 window.location.href = 'citizen-dashboard.html';
             }, 1500);
         } else {
-            showAlert(response.message || 'OTP যাচাইকরণ ব্যর্থ হয়েছে', 'error');
+            console.error('❌ Backend verification failed:', response.message);
+            showAlert(response.message || 'OTP যাচাইকরণ ব্যর্থ', 'error');
         }
     } catch (error) {
-        console.error('OTP verification error:', error);
+        console.error('❌ OTP verification error:', error);
         showAlert('সার্ভার ত্রুটি। আবার চেষ্টা করুন', 'error');
     } finally {
         setButtonLoading('submitBtn', false);
@@ -100,9 +235,11 @@ async function handleVerifyOTP(e) {
 }
 
 /**
- * Resend OTP
+ * Resend OTP with backend
  */
 async function resendOTP() {
+    console.log('🔄 Resending OTP...');
+    
     const nid = sessionStorage.getItem('otp_nid');
     const phone = sessionStorage.getItem('otp_phone');
     
@@ -116,13 +253,21 @@ async function resendOTP() {
     resendBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> পাঠানো হচ্ছে...';
     
     try {
+        // Resend OTP via backend
         const response = await apiRequest('SEND_OTP', 'POST', {
             nid,
             phoneNumber: phone
         });
         
         if (response.success) {
-            showAlert('নতুন OTP পাঠানো হয়েছে', 'success');
+            console.log('✅ OTP resent successfully');
+            console.log('🔑 New OTP:', response.data.devOtp || 'Check backend console');
+            
+            if (response.data.devOtp) {
+                showAlert(`নতুন OTP: ${response.data.devOtp}`, 'success', '✓ সফল', 8000);
+            } else {
+                showAlert('নতুন OTP পাঠানো হয়েছে', 'success');
+            }
             
             // Update expiry time
             if (response.data.expiresIn) {
@@ -130,10 +275,11 @@ async function resendOTP() {
                 document.getElementById('expiryTime').textContent = response.data.expiresIn;
             }
         } else {
+            console.error('❌ Failed to resend OTP:', response.message);
             showAlert(response.message || 'OTP পাঠাতে ব্যর্থ হয়েছে', 'error');
         }
     } catch (error) {
-        console.error('Resend OTP error:', error);
+        console.error('❌ Resend OTP error:', error);
         showAlert('সার্ভার ত্রুটি। আবার চেষ্টা করুন', 'error');
     } finally {
         resendBtn.disabled = false;

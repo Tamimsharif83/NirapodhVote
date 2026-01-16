@@ -5,11 +5,36 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const PreregisteredCitizen = require('../models/PreregisteredCitizen');
 const OTP = require('../models/OTP');
-const { sendOTP } = require('../services/twilioService');
 const { normalizeBDPhone, generateOTP, getOTPExpiry } = require('../utils/helpers');
+const { getFirebaseConfig, validateFirebaseConfig } = require('../services/firebaseService');
 
 // JWT Secret (in production, use a strong secret from .env)
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+
+// Get Firebase Config for frontend
+router.get('/firebase-config', (req, res) => {
+  try {
+    console.log('🔥 Firebase config requested from client');
+    
+    if (!validateFirebaseConfig()) {
+      return res.status(500).json({
+        success: false,
+        message: 'Firebase configuration is incomplete'
+      });
+    }
+    
+    res.json({
+      success: true,
+      config: getFirebaseConfig()
+    });
+  } catch (error) {
+    console.error('❌ Error providing Firebase config:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get Firebase configuration'
+    });
+  }
+});
 
 // Step 1: Check NID and Phone, Send OTP
 router.post('/send-otp', async (req, res) => {
@@ -77,16 +102,9 @@ router.post('/send-otp', async (req, res) => {
     });
     await otpRecord.save();
 
-    // Send OTP via Twilio (skip in dev mode)
-    if (process.env.DEV_MODE === 'true') {
-      console.log('🔧 DEV MODE: Skipping Twilio SMS');
-      console.log('📱 Use this OTP for testing: 123456');
-      // In dev mode, always use 123456 as OTP
-      otpRecord.otp = '123456';
-      await otpRecord.save();
-    } else {
-      await sendOTP(normalizedPhone, otpCode);
-    }
+    // Log OTP for development/testing (since we don't have SMS service)
+    console.log('📱 OTP Generated for testing:', otpCode);
+    console.log('📱 For NID:', nid);
 
     res.json({
       success: true,
@@ -95,7 +113,8 @@ router.post('/send-otp', async (req, res) => {
         nid,
         phoneNumber: normalizedPhone,
         expiresIn: process.env.OTP_EXPIRY_MINUTES || 2,
-        ...(process.env.DEV_MODE === 'true' && { devOtp: '123456' }) // Show OTP in dev mode
+        // Show OTP in response for testing (remove in production with real SMS service)
+        devOtp: otpCode
       }
     });
   } catch (error) {
