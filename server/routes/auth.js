@@ -25,7 +25,8 @@ router.get('/firebase-config', (req, res) => {
     
     res.json({
       success: true,
-      config: getFirebaseConfig()
+      config: getFirebaseConfig(),
+      useFirebase: process.env.USE_FIREBASE_OTP === 'true'
     });
   } catch (error) {
     console.error('❌ Error providing Firebase config:', error);
