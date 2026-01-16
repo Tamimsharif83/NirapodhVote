@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OTP Test</title>
+</head>
+<body>
+    <h1>Test OTP Send</h1>
+    <button onclick="testSendOTP()">Test Send OTP</button>
+    <div id="result"></div>
+
+    <script src="assets/js/api-config.js"></script>
+    <script>
+        async function testSendOTP() {
+            console.log('Testing OTP send...');
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Sending...';
+            
+            try {
+                const response = await apiRequest('SEND_OTP', 'POST', {
+                    nid: '8724522829',
+                    phoneNumber: '01788504010'
+                });
+                
+                console.log('Response:', response);
+                resultDiv.innerHTML = '<pre>' + JSON.stringify(response, null, 2) + '</pre>';
+            } catch (error) {
+                console.error('Error:', error);
+                resultDiv.innerHTML = '<pre>Error: ' + error.message + '</pre>';
+            }
+        }
+    </script>
+</body>
+</html>

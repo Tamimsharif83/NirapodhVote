@@ -3,20 +3,156 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const PreregisteredCitizen = require('../models/PreregisteredCitizen');
+const OTP = require('../models/OTP');
+const { sendOTP } = require('../services/twilioService');
+const { normalizeBDPhone, generateOTP, getOTPExpiry } = require('../utils/helpers');
 
 // JWT Secret (in production, use a strong secret from .env)
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
-// Register Route
-router.post('/register', async (req, res) => {
+// Step 1: Check NID and Phone, Send OTP
+router.post('/send-otp', async (req, res) => {
   try {
-    const { nid, password, name, dob, fatherName, motherName, permanentAddress, presentAddress } = req.body;
+    const { nid, phoneNumber } = req.body;
 
     // Validation
-    if (!nid || !password || !name || !dob || !fatherName || !motherName || !permanentAddress || !presentAddress) {
+    if (!nid || !phoneNumber) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'NID এবং ফোন নম্বর প্রদান করুন' 
+      });
+    }
+
+    // Normalize phone number
+    const normalizedPhone = normalizeBDPhone(phoneNumber);
+    if (!normalizedPhone) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'অবৈধ ফোন নম্বর। বাংলাদেশি ফোন নম্বর ব্যবহার করুন (যেমন: 01788504010)' 
+      });
+    }
+
+    // Check if NID and phone match in preregistered citizens
+    const preregistered = await PreregisteredCitizen.findOne({ nid });
+    
+    if (!preregistered) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'এই NID পূর্ব-নিবন্ধিত নাগরিক তালিকায় নেই' 
+      });
+    }
+
+    // Check if already registered
+    if (preregistered.hasRegistered) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'এই NID ইতিমধ্যে নিবন্ধিত হয়েছে' 
+      });
+    }
+
+    // Normalize stored phone number for comparison
+    const normalizedStoredPhone = normalizeBDPhone(preregistered.mobileNumber);
+    
+    if (normalizedPhone !== normalizedStoredPhone) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'ফোন নম্বর মিলছে না। পূর্ব-নিবন্ধিত ফোন নম্বর ব্যবহার করুন' 
+      });
+    }
+
+    // Generate OTP
+    const otpCode = generateOTP();
+    const expiresAt = getOTPExpiry(process.env.OTP_EXPIRY_MINUTES || 2);
+
+    // Delete any existing OTP for this NID
+    await OTP.deleteMany({ nid });
+
+    // Save OTP to database
+    const otpRecord = new OTP({
+      nid,
+      phoneNumber: normalizedPhone,
+      otp: otpCode,
+      expiresAt
+    });
+    await otpRecord.save();
+
+    // Send OTP via Twilio (skip in dev mode)
+    if (process.env.DEV_MODE === 'true') {
+      console.log('🔧 DEV MODE: Skipping Twilio SMS');
+      console.log('📱 Use this OTP for testing: 123456');
+      // In dev mode, always use 123456 as OTP
+      otpRecord.otp = '123456';
+      await otpRecord.save();
+    } else {
+      await sendOTP(normalizedPhone, otpCode);
+    }
+
+    res.json({
+      success: true,
+      message: 'OTP আপনার ফোনে পাঠানো হয়েছে',
+      data: {
+        nid,
+        phoneNumber: normalizedPhone,
+        expiresIn: process.env.OTP_EXPIRY_MINUTES || 2,
+        ...(process.env.DEV_MODE === 'true' && { devOtp: '123456' }) // Show OTP in dev mode
+      }
+    });
+  } catch (error) {
+    console.error('Send OTP error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'OTP পাঠাতে ব্যর্থ হয়েছে। আবার চেষ্টা করুন' 
+    });
+  }
+});
+
+// Step 2: Verify OTP and Register User
+router.post('/verify-otp-register', async (req, res) => {
+  try {
+    const { nid, otp, password, presentAddress } = req.body;
+
+    // Validation
+    if (!nid || !otp || !password || !presentAddress) {
       return res.status(400).json({ 
         success: false, 
         message: 'সকল তথ্য প্রদান করুন' 
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে' 
+      });
+    }
+
+    // Find OTP record
+    const otpRecord = await OTP.findOne({ nid, otp, verified: false });
+    
+    if (!otpRecord) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'অবৈধ অথবা মেয়াদোত্তীর্ণ OTP' 
+      });
+    }
+
+    // Check if OTP has expired
+    if (new Date() > otpRecord.expiresAt) {
+      await OTP.deleteOne({ _id: otpRecord._id });
+      return res.status(400).json({ 
+        success: false, 
+        message: 'OTP মেয়াদোত্তীর্ণ হয়েছে। নতুন OTP পাঠান' 
+      });
+    }
+
+    // Get preregistered citizen data
+    const preregistered = await PreregisteredCitizen.findOne({ nid });
+    
+    if (!preregistered) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'পূর্ব-নিবন্ধিত নাগরিক তথ্য পাওয়া যায়নি' 
       });
     }
 
@@ -29,19 +165,28 @@ router.post('/register', async (req, res) => {
       });
     }
 
-    // Create new user
+    // Create new user with preregistered data
     const user = new User({
-      nid,
+      nid: preregistered.nid,
       password,
-      name,
-      dob,
-      fatherName,
-      motherName,
-      permanentAddress,
+      name: preregistered.name,
+      dob: preregistered.dob,
+      fatherName: preregistered.fatherName,
+      motherName: preregistered.motherName,
+      permanentAddress: preregistered.permanentAddress,
       presentAddress
     });
 
     await user.save();
+
+    // Mark OTP as verified
+    otpRecord.verified = true;
+    await otpRecord.save();
+
+    // Update preregistered citizen record
+    preregistered.hasRegistered = true;
+    preregistered.userId = user._id;
+    await preregistered.save();
 
     // Generate JWT token
     const token = jwt.sign({ id: user._id, nid: user.nid }, JWT_SECRET, { expiresIn: '7d' });

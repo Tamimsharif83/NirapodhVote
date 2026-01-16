@@ -8,6 +8,8 @@ const API_CONFIG = {
     REGISTER: '/auth/register',
     LOGIN: '/auth/login',
     GET_USER: '/auth/me',
+    SEND_OTP: '/auth/send-otp',
+    VERIFY_OTP_REGISTER: '/auth/verify-otp-register',
     
     // Vote endpoints
     CAST_VOTE: '/vote/cast',
@@ -31,6 +33,12 @@ function getApiUrl(endpoint) {
 // Helper function to make API requests
 async function apiRequest(endpoint, method = 'GET', data = null, requiresAuth = false) {
   const url = getApiUrl(endpoint);
+  console.log('=== API Request ===');
+  console.log('Endpoint:', endpoint);
+  console.log('URL:', url);
+  console.log('Method:', method);
+  console.log('Data:', data);
+  
   const options = {
     method,
     headers: {
@@ -51,9 +59,14 @@ async function apiRequest(endpoint, method = 'GET', data = null, requiresAuth = 
     options.body = JSON.stringify(data);
   }
 
+  console.log('Request Options:', options);
+
   try {
+    console.log('Sending fetch request...');
     const response = await fetch(url, options);
+    console.log('Response status:', response.status);
     const result = await response.json();
+    console.log('Response data:', result);
     
     if (!response.ok) {
       throw new Error(result.message || 'Request failed');

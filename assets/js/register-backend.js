@@ -1,24 +1,102 @@
-// Register page JavaScript - Backend Connected Version
+// Register page JavaScript - Backend Connected Version with OTP
+
+console.log('🔍 register-backend.js loaded');
 
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('🔍 DOM loaded, setting up form handler');
     const registerForm = document.getElementById('registerForm');
     
-    if (registerForm) {
-        registerForm.addEventListener('submit', handleRegister);
-        
-        // Auto-fetch demo on NID and DOB input
-        const nidInput = document.getElementById('nid');
-        const dobInput = document.getElementById('dob');
-        
-        if (nidInput && dobInput) {
-            dobInput.addEventListener('change', function() {
-                if (validateNID(nidInput.value) && dobInput.value) {
-                    simulateAutoFetch();
-                }
-            });
-        }
+    if (!registerForm) {
+        console.error('❌ registerForm not found!');
+        return;
     }
+    
+    console.log('✅ Form found, attaching submit handler');
+    
+    registerForm.addEventListener('submit', function(e) {
+        console.log('🎯 FORM SUBMIT EVENT TRIGGERED!');
+        handleRegister(e);
+    });
+    
+    // Also add click handler to button as backup
+    const submitBtn = document.getElementById('submitBtn');
+    if (submitBtn) {
+        submitBtn.addEventListener('click', function(e) {
+            console.log('🎯 BUTTON CLICK EVENT TRIGGERED!');
+        });
+    }
+    
+    console.log('✅ Setup complete');
 });
+
+/**
+ * Handle the initial registration - Send OTP
+ */
+async function handleRegister(e) {
+    e.preventDefault();
+    
+    console.log('=== Register Form Submitted ===');
+    
+    // Get form values
+    const nid = document.getElementById('nid').value.trim();
+    const phoneNumber = document.getElementById('phoneNumber').value.trim();
+    const dob = document.getElementById('dob').value;
+    
+    console.log('Form Values:', { nid, phoneNumber, dob });
+    
+    // Validation
+    if (!nid || !phoneNumber || !dob) {
+        console.log('Validation failed: Missing fields');
+        showAlert('সকল তথ্য প্রদান করুন', 'error');
+        return;
+    }
+    
+    if (nid.length < 10) {
+        console.log('Validation failed: Invalid NID length');
+        showAlert('বৈধ NID নম্বর প্রদান করুন', 'error');
+        return;
+    }
+    
+    console.log('Validation passed, setting button loading...');
+    setButtonLoading('submitBtn', true);
+    
+    try {
+        console.log('Calling API with:', { nid, phoneNumber });
+        
+        // Send OTP request
+        const response = await apiRequest('SEND_OTP', 'POST', {
+            nid,
+            phoneNumber
+        });
+        
+        console.log('API Response:', response);
+        
+        if (response.success) {
+            // Store data in session for OTP verification page
+            sessionStorage.setItem('otp_nid', nid);
+            sessionStorage.setItem('otp_phone', response.data.phoneNumber);
+            sessionStorage.setItem('otp_dob', dob);
+            sessionStorage.setItem('otp_expires', response.data.expiresIn);
+            
+            console.log('Success! Showing alert and redirecting...');
+            showAlert(response.message, 'success');
+            
+            // Redirect to OTP verification page after 1 second
+            setTimeout(() => {
+                window.location.href = 'verify-otp.html';
+            }, 1000);
+        } else {
+            console.log('API returned error:', response.message);
+            showAlert(response.message || 'OTP পাঠাতে ব্যর্থ হয়েছে', 'error');
+        }
+    } catch (error) {
+        console.error('Send OTP error:', error);
+        showAlert('সার্ভার ত্রুটি। আবার চেষ্টা করুন', 'error');
+    } finally {
+        console.log('Removing button loading state...');
+        setButtonLoading('submitBtn', false);
+    }
+}
 
 /* ===========================
    UI STATE MANAGEMENT
@@ -65,80 +143,27 @@ function showAlert(message, type = 'info', title = '', duration = 5000) {
     }, duration);
 }
 
-// Show Loading State
-function showLoadingState() {
-    const form = document.getElementById('registerForm');
-    if (!form) return;
 
-    const submitBtn = document.getElementById('submitBtn');
-    const btnText = document.getElementById('btnText');
-    const btnLoader = document.getElementById('btnLoader');
-
-    if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.classList.add('loading');
-    }
-
-    if (btnText) btnText.style.display = 'none';
-    if (btnLoader) {
-        btnLoader.classList.remove('hidden');
-        btnLoader.style.display = 'inline-block';
-    }
-}
-
-// Hide Loading State
-function hideLoadingState() {
-    const submitBtn = document.getElementById('submitBtn');
-    const btnText = document.getElementById('btnText');
-    const btnLoader = document.getElementById('btnLoader');
-
-    if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.classList.remove('loading');
-    }
-
-    if (btnText) btnText.style.display = 'inline';
-    if (btnLoader) {
-        btnLoader.classList.add('hidden');
-        btnLoader.style.display = 'none';
+// Set button loading state
+function setButtonLoading(buttonId, isLoading) {
+    const button = document.getElementById(buttonId);
+    const btnText = button?.querySelector('#btnText');
+    const btnLoader = button?.querySelector('#btnLoader');
+    
+    if (!button) return;
+    
+    if (isLoading) {
+        button.disabled = true;
+        if (btnText) btnText.style.display = 'none';
+        if (btnLoader) btnLoader.style.display = 'inline-block';
+    } else {
+        button.disabled = false;
+        if (btnText) btnText.style.display = 'inline';
+        if (btnLoader) btnLoader.style.display = 'none';
     }
 }
 
-// Show Loading State for Auto-fetch
-function showAutoFetchLoadingState() {
-    const autoFetchInfo = document.getElementById('autoFetchInfo');
-    if (autoFetchInfo) {
-        autoFetchInfo.innerHTML = `
-            <div class="loading-state">
-                <div class="loading-spinner"></div>
-            </div>
-        `;
-        autoFetchInfo.style.display = 'block';
-    }
-}
 
-// Show Success State for Auto-fetch
-function showAutoFetchSuccessState() {
-    const autoFetchInfo = document.getElementById('autoFetchInfo');
-    if (autoFetchInfo) {
-        autoFetchInfo.innerHTML = `
-            <h4>✓ স্বয়ংক্রিয় তথ্য সংগ্রহ</h4>
-            <div class="info-item">
-                <label>মোবাইল নম্বর:</label>
-                <span id="fetchedPhone">০১৭১২৩৪৫৬৭৮</span>
-            </div>
-            <div class="info-item">
-                <label>ঠিকানা:</label>
-                <span id="fetchedAddress">ঢাকা, বাংলাদেশ</span>
-            </div>
-            <div class="info-item">
-                <label>ভোট কেন্দ্র:</label>
-                <span id="fetchedCenter">ঢাকা সিটি কলেজ</span>
-            </div>
-        `;
-        autoFetchInfo.style.display = 'block';
-    }
-}
 
 // Validate Form
 function validateRegisterForm() {
@@ -161,52 +186,6 @@ function validateRegisterForm() {
     return errors;
 }
 
-// Handle Register Form Submit
-async function handleRegister(e) {
-    e.preventDefault();
-    
-    // Validate form
-    const errors = validateRegisterForm();
-    
-    if (errors.length > 0) {
-        showAlert(errors.join(', '), 'error', '✗ ত্রুটি');
-        return;
-    }
-
-    const nid = document.getElementById('nid').value.trim();
-    const dob = document.getElementById('dob').value;
-    
-    // Store NID and DOB temporarily for signup page
-    sessionStorage.setItem('registeringNid', nid);
-    sessionStorage.setItem('registeringDob', dob);
-    
-    // Show success message and redirect to signup
-    showLoadingState();
-    
-    setTimeout(() => {
-        hideLoadingState();
-        
-        const alertContainer = document.getElementById('alertContainer');
-        if (alertContainer) {
-            alertContainer.innerHTML = `
-                <div class="alert alert-success">
-                    <div class="alert-icon">
-                        <i class="fa-solid fa-circle-check"></i>
-                    </div>
-                    <div class="alert-content">
-                        <div class="alert-title">✓ যাচাই সফল!</div>
-                        <div class="alert-message">আপনার অ্যাকাউন্ট সম্পূর্ণ করতে সাইনআপ পেজে যাচ্ছেন...</div>
-                    </div>
-                </div>
-            `;
-        }
-
-        // Redirect to signup page
-        setTimeout(() => {
-            window.location.href = 'signup.html';
-        }, 1500);
-    }, 1000);
-}
 
 function simulateAutoFetch() {
     showAutoFetchLoadingState();

@@ -47,6 +47,18 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="phoneNumber">মোবাইল নম্বর *</label>
+                        <input 
+                            type="tel" 
+                            id="phoneNumber" 
+                            name="phoneNumber" 
+                            placeholder="আপনার মোবাইল নম্বর লিখুন"
+                            required
+                        >
+                        <small class="form-hint">উদাহরণ: 01788504010 বা +8801788504010</small>
+                    </div>
+
+                    <div class="form-group">
                         <label for="dob">জন্ম তারিখ *</label>
                         <input 
                             type="date" 
@@ -73,7 +85,7 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary btn-full" id="submitBtn">
+                    <button type="submit" class="btn btn-primary btn-full" id="submitBtn" onclick="console.log('Button clicked!'); return true;">
                         <span id="btnText">যাচাই করুন ও OTP পাঠান</span>
                         <span id="btnLoader" class="loading" style="display: none;"></span>
                     </button>
@@ -114,6 +126,17 @@
     </footer>
 
     <script src="assets/js/common.js"></script>
-    <script src="assets/js/register.js"></script>
+    <script src="assets/js/api-config.js"></script>
+    <script src="assets/js/register-backend.js"></script>
+    
+    <script>
+        console.log('=== PAGE LOADED ===');
+        console.log('Checking if scripts loaded...');
+        
+        setTimeout(function() {
+            console.log('apiRequest available?', typeof apiRequest === 'function');
+            console.log('handleRegister available?', typeof handleRegister === 'function');
+        }, 500);
+    </script>
 </body>
 </html>
