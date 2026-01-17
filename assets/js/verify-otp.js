@@ -237,13 +237,12 @@ async function handleVerifyOTP(e) {
             sessionStorage.removeItem('otp_dob');
             sessionStorage.removeItem('otp_expires');
             
-            // Save token and user info
-            localStorage.setItem('token', response.token);
-            localStorage.setItem('user', JSON.stringify(response.user));
+            // DO NOT auto-login - user should login manually
+            // User password is already hashed and saved in database by backend
             
-            // Redirect to dashboard or login
+            // Redirect to login page
             setTimeout(() => {
-                window.location.href = 'citizen-dashboard.html';
+                window.location.href = 'login.html';
             }, 2000);
         } else {
             console.error('❌ Backend verification failed:', response.message);

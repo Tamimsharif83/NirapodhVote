@@ -1,30 +1,47 @@
-// Login page JavaScript with UI States
+// Login page JavaScript with Backend Integration
 
 document.addEventListener('DOMContentLoaded', function() {
     const loginForm = document.getElementById('loginForm');
     
+    // Only check for existing login if NOT explicitly navigating to login page
+    // This allows users to logout and login again
+    const fromLogout = sessionStorage.getItem('justLoggedOut');
+    if (fromLogout) {
+        sessionStorage.removeItem('justLoggedOut');
+        removeAuthToken();
+        removeUserData();
+    } else {
+        // Check if user is already logged in
+        const token = getAuthToken();
+        if (token) {
+            verifyToken(token);
+        }
+    }
+
     if (loginForm) {
         loginForm.addEventListener('submit', handleLogin);
     }
 });
 
-/* ===========================
-   REGISTERED USERS STORAGE
-   =========================== */
-
-// Get all registered users
-function getRegisteredUsers() {
-    const users = localStorage.getItem('nirapodh_users');
-    return users ? JSON.parse(users) : {};
-}
-
-// Verify user credentials
-function verifyUserCredentials(nid, password) {
-    const users = getRegisteredUsers();
-    if (!users.hasOwnProperty(nid)) {
-        return false;
+// Verify if the stored token is still valid
+async function verifyToken(token) {
+    try {
+        const response = await apiRequest('GET_USER', 'GET', null, true);
+        if (response.success) {
+            console.log('User already logged in, redirecting to dashboard');
+            window.location.href = 'citizen-dashboard.html';
+        } else {
+            // Token invalid or expired
+            console.log('Token expired or invalid, clearing auth');
+            removeAuthToken();
+            removeUserData();
+        }
+    } catch (error) {
+        console.error('Token verification failed:', error);
+        // Clear invalid token on error
+        removeAuthToken();
+        removeUserData();
     }
-    return users[nid].password === password;
 }
 
 /* ===========================
@@ -135,21 +152,10 @@ function showSuccessState() {
     form.style.opacity = '0.6';
     form.style.pointerEvents = 'none';
 
-    // Redirect after 2 seconds
+    // Redirect after 1.5 seconds
     setTimeout(() => {
         window.location.href = 'citizen-dashboard.html';
-    }, 2000);
-}
-
-// Show Network Error State
-function showNetworkError() {
-    showAlert('সার্ভারের সাথে সংযোগ ব্যর্থ। অনুগ্রহ করে পুনরায় চেষ্টা করুন।', 'error', '✗ নেটওয়ার্ক ত্রুটি');
-}
-
-// Show Server Error State
-function showServerError(message = '') {
-    const errorMsg = message || 'অ্যাকাউন্ট খুঁজে পাওয়া যায়নি। NID এবং পাসওয়ার্ড পুনরায় পরীক্ষা করুন।';
-    showAlert(errorMsg, 'error', '✗ লগইন ব্যর্থ');
+    }, 1500);
 }
 
 // Validate Form
@@ -168,14 +174,14 @@ function validateLoginForm() {
 
     if (!password) {
         errors.push('পাসওয়ার্ড প্রয়োজন');
-    } else if (password.length < 8) {
-        errors.push('পাসওয়ার্ড কমপক্ষে ৮ অক্ষরের হতে হবে');
+    } else if (password.length < 6) { // Changed to 6 as per backend validation
+        errors.push('পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে');
     }
 
     return errors;
 }
 
-function handleLogin(e) {
+async function handleLogin(e) {
     e.preventDefault();
     
     // Validate form
@@ -189,29 +195,39 @@ function handleLogin(e) {
     // Show loading state
     showLoadingState();
 
-    // Simulate API call
-    setTimeout(() => {
-        const nid = document.getElementById('nid').value;
-        const password = document.getElementById('password').value;
-        
-        // Verify against registered users
-        const isSuccess = verifyUserCredentials(nid, password);
+    try {
+        const nid = document.getElementById('nid').value.trim();
+        const password = document.getElementById('password').value; // Don't trim password
 
-        if (isSuccess) {
-            // Save logged-in user info to sessionStorage
-            sessionStorage.setItem('loggedInUser', nid);
+        // Call Backend API
+        const response = await apiRequest('LOGIN', 'POST', {
+            nid,
+            password
+        });
+
+        if (response.success) {
+            // Save info
+            console.log('Login Response:', response); // Debug log
+            console.log('User Data to Save:', response.user); // Debug log
+            saveAuthToken(response.token);
+            saveUserData(response.user);
+            
             showSuccessState();
         } else {
             hideLoadingState();
-            showServerError('এই NID এবং পাসওয়ার্ড মেলেনি। অনুগ্রহ করে আবার চেষ্টা করুন বা নিবন্ধন করুন।');
+            showAlert(response.message || 'লগইন ব্যর্থ হয়েছে', 'error', '✗ লগইন ব্যর্থ');
         }
-    }, 2000);
+
+    } catch (error) {
+        hideLoadingState();
+        console.error('Login error:', error);
+        showAlert(error.message || 'সার্ভার ত্রুটি। অনুগ্রহ করে আবার চেষ্টা করুন।', 'error', '✗ ত্রুটি');
+    }
 }
 
 // Forgot Password Handler
 function forgotPassword() {
-    showAlert('পাসওয়ার্ড রিসেট লিংক আপনার মোবাইলে পাঠানো হয়েছে।', 'info', 'ℹ তথ্য');
-    return false;
+    showAlert('পাসওয়ার্ড রিসেট লিংক আপনার মোবাইলে পাঠানো হয়েছে (মক)।', 'info', 'ℹ তথ্য');
 }
 
 // Toggle password visibility

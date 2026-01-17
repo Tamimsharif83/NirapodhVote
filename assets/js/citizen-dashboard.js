@@ -14,6 +14,7 @@ function initializeDashboard() {
     
     // Check if user is logged in
     const userData = getUserData();
+    console.log('Dashboard - User Data:', userData); // Debug log
     if (!userData) {
         window.location.href = 'login.html';
         return;
@@ -21,7 +22,8 @@ function initializeDashboard() {
     
     // Display user name
     document.getElementById('userName').textContent = userData.name || 'নাগরিক';
-    document.getElementById('userArea').textContent = userData.area || 'ঢাকা-১০';
+    document.getElementById('userArea').textContent = userData.votingArea || 'N/A';
+    console.log('Dashboard - Voting Area:', userData.votingArea); // Debug log
     
     // Set active section from URL hash or default to voting
     const hash = window.location.hash.substring(1) || 'voting';
@@ -137,26 +139,32 @@ function closeSidebarMobile() {
 }
 
 
-// Get user data (simulate - in real app, get from server/session)
+// Get user data
 function getUserData() {
-    // In real application, this would fetch from session/localStorage
-    return {
-        name: 'মোঃ আবদুল করিম',
-        nid: '1234567890123',
-        phone: '01712345678',
-        area: 'ঢাকা-১০'
-    };
+    // Try to get from localStorage (set by login)
+    const storedUser = localStorage.getItem('nirapodh_user');
+    if (storedUser) {
+        try {
+            return JSON.parse(storedUser);
+        } catch (e) {
+            console.error('Error parsing user data:', e);
+            return null;
+        }
+    }
+    return null;
 }
 
 // Load user data
 function loadUserData() {
-    // Simulate loading ballots for user's area
-    console.log('ব্যবহারকারীর তথ্য লোড হচ্ছে...');
-    
-    // In real app, fetch from API:
-    // fetch('/api/ballots?area=' + userData.area)
-    //     .then(response => response.json())
-    //     .then(data => displayBallots(data));
+    const userData = getUserData();
+    if (userData) {
+        console.log('ব্যবহারকারীর তথ্য লোড হয়েছে:', userData.name);
+        document.getElementById('userName').textContent = userData.name || 'নাগরিক';
+        if (userData.votingArea) {
+            document.getElementById('userArea').textContent = userData.votingArea;
+        }
+        // You might need to fetch ballot data based on user area from API here
+    }
 }
 
 // Update time remaining for active ballots
@@ -697,34 +705,6 @@ function closeCandidateModal() {
 }
 
 // ============= FOUR STATES OF UI =============
-
-// Show Alert (Success, Error, Warning, Info)
-function showAlert(message, type = 'info') {
-    const alertContainer = document.getElementById('alertContainer');
-    if (!alertContainer) return;
-
-    const icons = {
-        success: '✓',
-        error: '✕',
-        warning: '⚠',
-        info: 'ℹ'
-    };
-
-    const alert = document.createElement('div');
-    alert.className = `alert alert-${type}`;
-    alert.innerHTML = `
-        <span class="alert-icon">${icons[type]}</span>
-        <span>${message}</span>
-    `;
-
-    alertContainer.appendChild(alert);
-
-    // Auto remove after 4 seconds
-    setTimeout(() => {
-        alert.classList.add('fade-out');
-        setTimeout(() => alert.remove(), 300);
-    }, 4000);
-}
 
 // Show Loading State
 function showLoadingState(container, type = 'ballot') {

@@ -65,6 +65,14 @@ function openChatBot() {
 // Logout function
 function logout() {
     if (confirm('আপনি কি লগআউট করতে চান?')) {
+        // Clear all auth related storage
+        localStorage.removeItem('nirapodh_token');
+        localStorage.removeItem('nirapodh_user');
+        sessionStorage.clear();
+        
+        // Set flag to prevent auto-redirect on login page
+        sessionStorage.setItem('justLoggedOut', 'true');
+        
         window.location.href = 'index.html';
     }
 }

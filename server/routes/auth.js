@@ -183,7 +183,8 @@ router.post('/verify-otp-register', async (req, res) => {
       fatherName: preregistered.fatherName,
       motherName: preregistered.motherName,
       permanentAddress: preregistered.permanentAddress,
-      presentAddress
+      presentAddress,
+      votingArea: preregistered.votingArea
     });
 
     await user.save();
@@ -208,6 +209,7 @@ router.post('/verify-otp-register', async (req, res) => {
         id: user._id,
         nid: user.nid,
         name: user.name,
+        votingArea: user.votingArea,
         hasVoted: user.hasVoted
       }
     });
@@ -235,7 +237,9 @@ router.post('/login', async (req, res) => {
 
     // Find user
     const user = await User.findOne({ nid });
+    console.log(`[LOGIN] Attempt for NID: ${nid}`);
     if (!user) {
+      console.log(`[LOGIN] User not found for NID: ${nid}`);
       return res.status(401).json({ 
         success: false, 
         message: 'ভুল NID অথবা পাসওয়ার্ড' 
@@ -243,13 +247,20 @@ router.post('/login', async (req, res) => {
     }
 
     // Check password
+    console.log(`[LOGIN] User found. Hashed Password: ${user.password.substring(0, 10)}...`);
     const isMatch = await user.comparePassword(password);
+    console.log(`[LOGIN] Password match result: ${isMatch} for input length: ${password.length}`);
     if (!isMatch) {
       return res.status(401).json({ 
         success: false, 
         message: 'ভুল NID অথবা পাসওয়ার্ড' 
       });
     }
+
+    // Fetch voting area from PreregisteredCitizen collection
+    const preregisteredCitizen = await PreregisteredCitizen.findOne({ nid });
+    const votingArea = preregisteredCitizen ? preregisteredCitizen.votingArea : 'N/A';
+    console.log(`[LOGIN] Fetched votingArea from preregistered: ${votingArea}`);
 
     // Generate JWT token
     const token = jwt.sign({ id: user._id, nid: user.nid }, JWT_SECRET, { expiresIn: '7d' });
@@ -262,6 +273,7 @@ router.post('/login', async (req, res) => {
         id: user._id,
         nid: user.nid,
         name: user.name,
+        votingArea: votingArea,
         hasVoted: user.hasVoted
       }
     });

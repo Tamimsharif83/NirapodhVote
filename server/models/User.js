@@ -39,6 +39,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  votingArea: {
+    type: String,
+    required: false
+  },
   hasVoted: {
     type: Boolean,
     default: false
