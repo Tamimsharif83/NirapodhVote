@@ -135,10 +135,6 @@ function showSuccessState() {
     form.style.opacity = '0.6';
     form.style.pointerEvents = 'none';
 
-    // Redirect after 2 seconds
-    setTimeout(() => {
-        window.location.href = 'citizen-dashboard.html';
-    }, 2000);
 }
 
 // Show Network Error State
@@ -175,7 +171,7 @@ function validateLoginForm() {
     return errors;
 }
 
-function handleLogin(e) {
+async function handleLogin(e) {
     e.preventDefault();
     
     // Validate form
@@ -189,23 +185,25 @@ function handleLogin(e) {
     // Show loading state
     showLoadingState();
 
-    // Simulate API call
-    setTimeout(() => {
-        const nid = document.getElementById('nid').value;
-        const password = document.getElementById('password').value;
-        
-        // Verify against registered users
-        const isSuccess = verifyUserCredentials(nid, password);
+    const nid = document.getElementById('nid').value;
+    const password = document.getElementById('password').value;
+    
+    try {
+        const response = await apiCall(API_ENDPOINTS.AUTH.LOGIN, {
+            method: 'POST',
+            body: JSON.stringify({ nid, password })
+        });
 
-        if (isSuccess) {
-            // Save logged-in user info to sessionStorage
-            sessionStorage.setItem('loggedInUser', nid);
+        if (response.success && response.token) {
+            // Save user info
+            localStorage.setItem('authToken', response.token);
             showSuccessState();
-        } else {
-            hideLoadingState();
-            showServerError('এই NID এবং পাসওয়ার্ড মেলেনি। অনুগ্রহ করে আবার চেষ্টা করুন বা নিবন্ধন করুন।');
+            window.location.href = 'citizen-dashboard.html';
         }
-    }, 2000);
+    } catch (error) {
+        hideLoadingState();
+        showServerError(error.message || 'এই NID এবং পাসওয়ার্ড মেলেনি। অনুগ্রহ করে আবার চেষ্টা করুন বা নিবন্ধন করুন।');
+    }
 }
 
 // Forgot Password Handler

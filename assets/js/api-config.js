@@ -1,99 +1,99 @@
-// API Configuration
-const API_CONFIG = {
-  BASE_URL: 'http://localhost:3000',
-  API_URL: 'http://localhost:3000/api',
-  SOCKET_URL: 'http://localhost:3000',
-  ENDPOINTS: {
+// assets/js/api-config.js
+const API_BASE_URL = 'http://localhost:3000/api';
+
+// API endpoints
+const API_ENDPOINTS = {
     // Auth endpoints
-    REGISTER: '/auth/register',
-    LOGIN: '/auth/login',
-    GET_USER: '/auth/me',
-    
-    // Vote endpoints
-    CAST_VOTE: '/vote/cast',
-    VOTE_STATUS: '/vote/status',
-    VOTE_STATISTICS: '/vote/statistics',
-    
+    AUTH: {
+        PRECHECK: `${API_BASE_URL}/auth/precheck`,
+        SEND_OTP: `${API_BASE_URL}/auth/send-otp`,
+        VERIFY_OTP: `${API_BASE_URL}/auth/verify-otp`,
+        REGISTER: `${API_BASE_URL}/auth/register`,
+        LOGIN: `${API_BASE_URL}/auth/login`,
+        ME: `${API_BASE_URL}/auth/me`
+    },
     // Admin endpoints
-    ADMIN_LOGIN: '/admin/login',
-    ADMIN_STATISTICS: '/admin/statistics',
-    ADMIN_USERS: '/admin/users',
-    ADMIN_VOTES: '/admin/votes',
-    CREATE_INITIAL_ADMIN: '/admin/create-initial-admin'
-  }
+    ADMIN: {
+        LOGIN: `${API_BASE_URL}/admin/login`,
+        STATISTICS: `${API_BASE_URL}/admin/statistics`,
+        USERS: `${API_BASE_URL}/admin/users`,
+        VOTES: `${API_BASE_URL}/admin/votes`
+    },
+    // Vote endpoints
+    VOTING: {
+        BALLOTS: `${API_BASE_URL}/vote/ballots`,
+        VOTE: `${API_BASE_URL}/vote/vote`,
+        STATUS: `${API_BASE_URL}/vote/status`,
+        STATISTICS: `${API_BASE_URL}/vote/statistics`
+    },
+    // Ballot endpoints
+    BALLOT: {
+        CREATE: `${API_BASE_URL}/ballot/create`,
+        LIST: `${API_BASE_URL}/ballot/list`,
+        ALL: `${API_BASE_URL}/ballot/all`
+    },
+    // Notice endpoints
+    NOTICE: {
+        CREATE: `${API_BASE_URL}/notice/create`,
+        LIST: `${API_BASE_URL}/notice/list`
+    },
+    // Complaint endpoints
+    COMPLAINT: {
+        CREATE: `${API_BASE_URL}/complaint/create`,
+        MY: `${API_BASE_URL}/complaint/my`,
+        ALL: `${API_BASE_URL}/complaint/all`
+    }
 };
 
-// Helper function to get full API URL
-function getApiUrl(endpoint) {
-  return API_CONFIG.API_URL + API_CONFIG.ENDPOINTS[endpoint];
-}
-
-// Helper function to make API requests
-async function apiRequest(endpoint, method = 'GET', data = null, requiresAuth = false) {
-  const url = getApiUrl(endpoint);
-  const options = {
-    method,
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  };
-
-  // Add auth token if required
-  if (requiresAuth) {
-    const token = localStorage.getItem('nirapodh_token');
-    if (token) {
-      options.headers['Authorization'] = `Bearer ${token}`;
-    }
-  }
-
-  // Add body for POST/PUT requests
-  if (data && (method === 'POST' || method === 'PUT')) {
-    options.body = JSON.stringify(data);
-  }
-
-  try {
-    const response = await fetch(url, options);
-    const result = await response.json();
-    
-    if (!response.ok) {
-      throw new Error(result.message || 'Request failed');
-    }
-    
-    return result;
-  } catch (error) {
-    console.error('API Request Error:', error);
-    throw error;
-  }
-}
-
-// Storage helpers
-function saveAuthToken(token) {
-  localStorage.setItem('nirapodh_token', token);
-}
-
+// Helper function to get auth token
 function getAuthToken() {
-  return localStorage.getItem('nirapodh_token');
+    return localStorage.getItem('authToken');
 }
 
+// Helper function to set auth token
+function setAuthToken(token) {
+    localStorage.setItem('authToken', token);
+}
+
+// Helper function to remove auth token
 function removeAuthToken() {
-  localStorage.removeItem('nirapodh_token');
+    localStorage.removeItem('authToken');
 }
 
-function saveUserData(userData) {
-  localStorage.setItem('nirapodh_user', JSON.stringify(userData));
-}
+// Helper function to make API calls
+async function apiCall(url, options = {}) {
+    const defaultOptions = {
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    };
 
-function getUserData() {
-  const data = localStorage.getItem('nirapodh_user');
-  return data ? JSON.parse(data) : null;
-}
+    // Add auth token if available
+    const token = getAuthToken();
+    if (token) {
+        defaultOptions.headers['Authorization'] = `Bearer ${token}`;
+    }
 
-function removeUserData() {
-  localStorage.removeItem('nirapodh_user');
-}
+    const finalOptions = {
+        ...defaultOptions,
+        ...options,
+        headers: {
+            ...defaultOptions.headers,
+            ...options.headers,
+        },
+    };
 
-function logout() {
-  removeAuthToken();
-  removeUserData();
-  window.location.href = '/login.html';
+    try {
+        const response = await fetch(url, finalOptions);
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || 'API request failed');
+        }
+
+        return data;
+    } catch (error) {
+        console.error('API Error:', error);
+        throw error;
+    }
 }

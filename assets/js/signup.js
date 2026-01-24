@@ -1,8 +1,15 @@
-// Signup page JavaScript
+// Signup page JavaScript - Backend Integration
 
 document.addEventListener('DOMContentLoaded', function() {
     const signupForm = document.getElementById('signupForm');
     const passwordInput = document.getElementById('password');
+    
+    // Display NID from session
+    const nid = sessionStorage.getItem('registeringNid');
+    const userNidElement = document.getElementById('userNid');
+    if (userNidElement && nid) {
+        userNidElement.textContent = nid;
+    }
     
     if (signupForm) {
         signupForm.addEventListener('submit', handleSignup);
@@ -12,28 +19,6 @@ document.addEventListener('DOMContentLoaded', function() {
         passwordInput.addEventListener('input', updatePasswordStrength);
     }
 });
-
-/* ===========================
-   REGISTERED USERS STORAGE
-   =========================== */
-
-// Get all registered users
-function getRegisteredUsers() {
-    const users = localStorage.getItem('nirapodh_users');
-    return users ? JSON.parse(users) : {};
-}
-
-// Update user password
-function updateUserPassword(nid, password) {
-    const users = getRegisteredUsers();
-    if (users.hasOwnProperty(nid)) {
-        users[nid].password = password;
-        users[nid].passwordSetAt = new Date().toISOString();
-        localStorage.setItem('nirapodh_users', JSON.stringify(users));
-        return true;
-    }
-    return false;
-}
 
 function updatePasswordStrength() {
     const password = document.getElementById('password').value;
@@ -58,7 +43,7 @@ function updatePasswordStrength() {
     }
 }
 
-function handleSignup(e) {
+async function handleSignup(e) {
     e.preventDefault();
     
     const password = document.getElementById('password').value;
@@ -83,38 +68,115 @@ function handleSignup(e) {
         return;
     }
     
+    const nid = sessionStorage.getItem('registeringNid');
+    const dob = sessionStorage.getItem('registeringDob');
+    
+    // Get citizen data from sessionStorage (stored from precheck)
+    const citizenData = JSON.parse(sessionStorage.getItem('citizenData') || '{}');
+    
+    if (!nid || !dob || !citizenData.name) {
+        showAlert('সেশন শেষ হয়েছে। অনুগ্রহ করে নতুন করে নিবন্ধন করুন।', 'error');
+        setTimeout(() => {
+            window.location.href = 'register.html';
+        }, 2000);
+        return;
+    }
+    
     setButtonLoading('submitBtn', true);
     
-    // Simulate API call
-    setTimeout(() => {
-        // Get the NID from sessionStorage (set during registration/login process)
-        const nid = sessionStorage.getItem('registeringNid');
-        
-        if (nid) {
-            // Update user password in registered users
-            const updated = updateUserPassword(nid, password);
-            
-            if (updated) {
-                setButtonLoading('submitBtn', false);
-                showAlert('অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে!', 'success');
-                
-                // Clear the session data
-                sessionStorage.removeItem('registeringNid');
-                
-                // Redirect to login page
-                setTimeout(() => {
-                    window.location.href = 'login.html';
-                }, 2000);
-            } else {
-                setButtonLoading('submitBtn', false);
-                showAlert('অ্যাকাউন্ট আপডেট করতে ব্যর্থ। পুনরায় চেষ্টা করুন।', 'error');
-            }
-        } else {
+    try {
+        const response = await apiCall(API_ENDPOINTS.AUTH.REGISTER, {
+            method: 'POST',
+            body: JSON.stringify({
+                nid,
+                password,
+                dob,
+                name: citizenData.name,
+                fatherName: citizenData.fatherName,
+                motherName: citizenData.motherName,
+                mobile: citizenData.mobile,
+                permanentAddress: citizenData.presentAddress, // Using same address
+                presentAddress: citizenData.presentAddress
+            })
+        });
+
+        if (response.success) {
             setButtonLoading('submitBtn', false);
-            showAlert('সেশন শেষ হয়েছে। অনুগ্রহ করে নতুন করে নিবন্ধন করুন।', 'error');
+            showAlert('অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে!', 'success');
+            
+            // Clear session data
+            sessionStorage.removeItem('registeringNid');
+            sessionStorage.removeItem('registeringDob');
+            sessionStorage.removeItem('citizenData');
+            
+            // Redirect to login page
             setTimeout(() => {
-                window.location.href = 'register.html';
+                window.location.href = 'login.html';
             }, 2000);
         }
-    }, 2000);
+    } catch (error) {
+        setButtonLoading('submitBtn', false);
+        showAlert(error.message || 'অ্যাকাউন্ট তৈরি করতে ব্যর্থ', 'error');
+    }
+}
+
+function checkPasswordStrength(password) {
+    let strength = 'weak';
+    if (password.length >= 8) {
+        const hasUpperCase = /[A-Z]/.test(password);
+        const hasLowerCase = /[a-z]/.test(password);
+        const hasNumbers = /[0-9]/.test(password);
+        const hasSpecial = /[!@#$%^&*]/.test(password);
+        
+        if (hasUpperCase && hasLowerCase && hasNumbers) {
+            strength = 'medium';
+        }
+        if (hasUpperCase && hasLowerCase && hasNumbers && hasSpecial) {
+            strength = 'strong';
+        }
+    }
+    return strength;
+}
+
+function setButtonLoading(btnId, loading) {
+    const btn = document.getElementById(btnId);
+    const btnText = document.getElementById('btnText');
+    const btnLoader = document.getElementById('btnLoader');
+    
+    if (loading) {
+        if (btn) btn.disabled = true;
+        if (btnText) btnText.style.display = 'none';
+        if (btnLoader) {
+            btnLoader.classList.remove('hidden');
+            btnLoader.style.display = 'inline-block';
+        }
+    } else {
+        if (btn) btn.disabled = false;
+        if (btnText) btnText.style.display = 'inline';
+        if (btnLoader) {
+            btnLoader.classList.add('hidden');
+            btnLoader.style.display = 'none';
+        }
+    }
+}
+
+function showAlert(message, type = 'info') {
+    const alertContainer = document.getElementById('alertContainer');
+    if (!alertContainer) return;
+
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type}`;
+    alertDiv.innerHTML = `
+        <div class="alert-content">
+            <span>${message}</span>
+            <button onclick="this.parentElement.parentElement.remove()">×</button>
+        </div>
+    `;
+
+    alertContainer.innerHTML = '';
+    alertContainer.appendChild(alertDiv);
+
+    setTimeout(() => {
+        alertDiv.remove();
+    }, 5000);
 }

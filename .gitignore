@@ -1,5 +1,5 @@
 Insert_data/
-
+server/scripts/ 
 # Environment variables
 .env
 .env.local

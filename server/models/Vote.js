@@ -1,31 +1,30 @@
-// Vote Model
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 const voteSchema = new mongoose.Schema({
-  candidate: {
-    type: String,
-    required: true,
-    enum: ['candidate-a', 'candidate-b', 'candidate-c', 'candidate-d']
-  },
-  userId: {
+  ballotId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: 'Ballot',
     required: true
   },
-  nid: {
+  candidateId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Candidate',
+    required: true
+  },
+  voterNid: {
     type: String,
     required: true
   },
-  timestamp: {
+  votedAt: {
     type: Date,
     default: Date.now
   },
-  ipAddress: {
-    type: String
-  }
+  ipAddress: String
 });
 
-// Index to ensure one vote per user
-voteSchema.index({ userId: 1 }, { unique: true });
-
-module.exports = mongoose.model('Vote', voteSchema);
+// One vote per citizen per ballot
+voteSchema.index(
+  { ballotId: 1, voterNid: 1 },
+  { unique: true }
+);

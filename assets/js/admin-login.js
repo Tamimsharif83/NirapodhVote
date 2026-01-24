@@ -1,4 +1,4 @@
-// Admin login page JavaScript
+// Admin login page JavaScript - Backend Integration
 
 document.addEventListener('DOMContentLoaded', function() {
     const adminLoginForm = document.getElementById('adminLoginForm');
@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-function handleAdminLogin(e) {
+async function handleAdminLogin(e) {
     e.preventDefault();
     
     const adminId = document.getElementById('adminId').value;
@@ -28,21 +28,33 @@ function handleAdminLogin(e) {
     
     setButtonLoading('submitBtn', true);
     
-    // Simulate API call
-    setTimeout(() => {
-        setButtonLoading('submitBtn', false);
-        
-        // Demo credentials check
-        if (adminId === 'ADMIN-2025-001' && password === 'admin123') {
+    try {
+        // Call backend API
+        const response = await apiCall(API_ENDPOINTS.ADMIN.LOGIN, {
+            method: 'POST',
+            body: JSON.stringify({
+                username: adminId,
+                password: password
+            })
+        });
+
+        if (response.success) {
+            // Save token
+            setAuthToken(response.token);
+            
+            // Save admin info
+            localStorage.setItem('admin_user', JSON.stringify(response.admin));
+            
             showAlert('প্রশাসক লগইন সফল হয়েছে!', 'success');
             
             setTimeout(() => {
                 window.location.href = 'admin-dashboard.html';
             }, 1500);
-        } else {
-            showAlert('ভুল প্রশাসক আইডি অথবা পাসওয়ার্ড', 'error');
         }
-    }, 2000);
+    } catch (error) {
+        setButtonLoading('submitBtn', false);
+        showAlert(error.message || 'ভুল প্রশাসক আইডি অথবা পাসওয়ার্ড', 'error');
+    }
 }
 
 function contactSupport() {

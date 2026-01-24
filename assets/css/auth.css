@@ -791,3 +791,33 @@
         font-size: 1.3rem;
     }
 }
+
+.otp-input-group {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    border: 2px solid #27ae60;
+    margin-top: 20px;
+}
+
+#otpTimer {
+    background: #fff;
+    padding: 8px 15px;
+    border-radius: 5px;
+    border: 2px solid currentColor;
+    font-family: 'Courier New', monospace;
+}
+
+.btn-secondary {
+    background-color: #95a5a6;
+    color: white;
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background-color: #7f8c8d;
+}
+
+.btn-secondary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

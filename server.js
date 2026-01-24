@@ -1,4 +1,4 @@
-// Main Server File - NirapodhVote Backend
+// server.js - UPDATED COMPLETE VERSION
 require('dotenv').config();
 const express = require('express');
 const http = require('http');
@@ -10,19 +10,22 @@ const connectDB = require('./server/config/db');
 const authRoutes = require('./server/routes/auth');
 const voteRoutes = require('./server/routes/vote');
 const adminRoutes = require('./server/routes/admin');
+const ballotRoutes = require('./server/routes/ballot');
+const noticeRoutes = require('./server/routes/notice');
+const complaintRoutes = require('./server/routes/complaint');
 
 const app = express();
 const server = http.createServer(app);
 
 // CORS configuration
 app.use(cors({
-  origin: '*', // In production, replace with your domain
+  origin: '*',
   credentials: true
 }));
 
 // Body parser middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '50mb' })); // Increased for base64 images
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Serve static files
 app.use(express.static(__dirname));
@@ -31,6 +34,9 @@ app.use(express.static(__dirname));
 app.use('/api/auth', authRoutes);
 app.use('/api/vote', voteRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/ballot', ballotRoutes);
+app.use('/api/notice', noticeRoutes);
+app.use('/api/complaint', complaintRoutes);
 
 // Socket.IO setup for chat
 const io = new Server(server, {
@@ -174,18 +180,27 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Server error:', err);
+  res.status(500).json({
+    success: false,
+    message: 'সার্ভার ত্রুটি ঘটেছে'
+  });
+});
+
 // Connect to MongoDB and start server
 const PORT = process.env.PORT || 3000;
 
 connectDB().then(() => {
   server.listen(PORT, () => {
     console.log(`
-╔════════════════════════════════════════════╗
+╔═══════════════════════════════════════════╗
 ║   🗳️  NirapodhVote Backend Server         ║
 ║   ✅ Server running on port ${PORT}          ║
 ║   ✅ MongoDB Connected                     ║
 ║   🌐 http://localhost:${PORT}               ║
-╚════════════════════════════════════════════╝
+╚═══════════════════════════════════════════╝
     `);
   });
 }).catch(err => {
